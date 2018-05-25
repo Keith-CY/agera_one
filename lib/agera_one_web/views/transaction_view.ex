@@ -11,10 +11,24 @@ defmodule AgeraOneWeb.TransactionView do
   end
 
   def render("transaction.json", %{transaction: transaction}) do
-    # %{block: %{hash: hash}} = transaction
     %{
-      hash: transaction.hash,
-      content: transaction.content
+      result: %{
+        hash: transaction.hash,
+        content: transaction.content
+      }
+    }
+  end
+
+  def render("transaction-receipt.json", %{transaction: transaction}) do
+    %{
+      result: %{
+        transactionHash: transaction.hash,
+        transactionIndex: transaction.index,
+        blockHash: transaction.block_hash,
+        blockNumber: transaction.block_number,
+        gasUsed: transaction.gas_used,
+        contractAddress: transaction.contract_address
+      }
     }
   end
 
@@ -24,8 +38,10 @@ defmodule AgeraOneWeb.TransactionView do
 
   def render("transaction-hash-content.json", %{transaction: transaction}) do
     %{
-      hash: transaction.hash,
-      content: transaction.content
+      result: %{
+        hash: transaction.hash,
+        content: transaction.content
+      }
     }
   end
 end

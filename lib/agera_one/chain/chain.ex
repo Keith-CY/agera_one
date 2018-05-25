@@ -6,9 +6,37 @@ defmodule AgeraOne.Chain do
   import Ecto.Query, warn: false
   alias AgeraOne.Repo
 
-  alias AgeraOne.Chain.{Block, Header, Transaction, Message}
+  alias AgeraOne.Chain.{Block, Header, Transaction, Message, Metadata}
 
   @chain_url "http://47.75.129.215:1337/"
+
+  @doc false
+  def get_metadata(number) do
+    case Repo.get_by(Metadata, number: number) do
+      %Metadata{} = metadata -> {:ok, metadata}
+      nil -> {:error, :not_found}
+    end
+  end
+
+  @doc false
+  def sync_metadata(number) do
+    case request_chain("cita_getMetaData", [number]) do
+      {:ok, %{"validators" => validators} = metadata} when is_list(validators) ->
+        metadata |> Map.put("number", number) |> create_metadata()
+
+      {:error, reason} ->
+        {:error, reason}
+
+      error ->
+        {:error, error}
+    end
+  end
+
+  def create_metadata(metadata_params \\ %{}) do
+    %Metadata{}
+    |> Metadata.changeset(metadata_params)
+    |> Repo.insert()
+  end
 
   @doc false
   def list_blocks do
@@ -69,7 +97,7 @@ defmodule AgeraOne.Chain do
     |> Ecto.Changeset.put_assoc(
       :transactions,
       Enum.map(tx_hashes, fn tx_hash ->
-        case get_transaction_by_hash(tx_hash) do
+        case get_transaction(%{hash: tx_hash}) do
           {:ok, tx} -> tx |> change_transaction
           {:error, error} -> IO.inspect(error)
         end
@@ -170,7 +198,9 @@ defmodule AgeraOne.Chain do
           0
       end
 
-    get_block(%{number: (current + 1) |> int_to_hex})
+    number = (current + 1) |> int_to_hex
+    sync_metadata(number)
+    get_block(%{number: number})
   end
 
   @doc false
@@ -236,24 +266,8 @@ defmodule AgeraOne.Chain do
     Repo.all(from(t in Transaction, limit: ^limit, offset: ^offset)) |> Repo.preload([:block])
   end
 
-  @doc """
-  Gets a single transaction.
-
-  Raises `Ecto.NoResultsError` if the Transaction does not exist.
-
-  ## Examples
-
-      iex> get_transaction!(123)
-      %Transaction{}
-
-      iex> get_transaction!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_transaction!(id), do: Repo.get!(Transaction, id)
-
   @doc false
-  def get_transaction_by_hash(hash) do
+  def get_transaction(%{hash: hash}) do
     case Repo.get_by(Transaction, hash: hash) do
       nil ->
         request_transaction(hash)
@@ -262,6 +276,9 @@ defmodule AgeraOne.Chain do
         {:ok, transaction}
     end
   end
+
+  @doc false
+  def get_transaction!(id), do: Repo.get!(Transaction, id)
 
   @doc """
   Request Transaction and Receipt by hash
@@ -360,7 +377,7 @@ defmodule AgeraOne.Chain do
     Transaction.changeset(transaction, %{})
   end
 
-  defp get_time(timestamp) do
+  def get_time(timestamp) do
     case DateTime.from_unix(timestamp, :microsecond) do
       {:ok, time} ->
         # DateTime.to_string(time)

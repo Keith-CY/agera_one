@@ -11,6 +11,10 @@ defmodule AgeraOneWeb.BlockView do
     %{result: render_one(block, BlockView, "block.json")}
   end
 
+  def render("block_number.json", %{number: number}) do
+    %{result: number}
+  end
+
   def render("block.json", %{block: block}) do
     %{
       version: block.version,

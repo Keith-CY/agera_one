@@ -17,4 +17,14 @@ defmodule AgeraOneWeb.FallbackController do
     |> put_status(:not_found)
     |> render(AgeraOneWeb.ErrorView, :"404")
   end
+
+  def call(conn, {:error, msg}) do
+    conn
+    |> render(AgeraOneWeb.ErrorView, "msg.json", msg: msg)
+  end
+
+  # def call(conn, %{:error, msg}) do
+  #   conn
+  #   |> render(AgeraOneWeb.ErrorView, "msg.json", msg: msg)
+  # end
 end
