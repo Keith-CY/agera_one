@@ -11,6 +11,7 @@ defmodule AgeraOne.Chain.Metadata do
     field(:validators, :string)
     field(:website, :string)
     field(:number, :string)
+    field(:peer_count, :string)
 
     timestamps()
   end
@@ -25,7 +26,8 @@ defmodule AgeraOne.Chain.Metadata do
       :operator,
       :website,
       :validators,
-      :number
+      :number,
+      :peer_count
     ])
     |> validate_required([
       :chain_id,
@@ -34,7 +36,8 @@ defmodule AgeraOne.Chain.Metadata do
       :operator,
       :website,
       :validators,
-      :number
+      :number,
+      :peer_count
     ])
   end
 
@@ -46,7 +49,8 @@ defmodule AgeraOne.Chain.Metadata do
            "operator" => operator,
            "validators" => validators,
            "website" => website,
-           "number" => number
+           "number" => number,
+           "peerCount" => peer_count
          } = attrs
        )
        when is_list(validators) do
@@ -57,7 +61,8 @@ defmodule AgeraOne.Chain.Metadata do
       operator: operator,
       website: website,
       number: number,
-      validators: validators |> Enum.join()
+      validators: validators |> Enum.join(),
+      peer_count: peer_count
     }
   end
 end

@@ -200,4 +200,68 @@ defmodule AgeraOne.ChainTest do
       assert %Ecto.Changeset{} = Chain.change_transaction(transaction)
     end
   end
+
+  describe "abis" do
+    alias AgeraOne.Chain.ABI
+
+    @valid_attrs %{addr: "some addr", content: "some content", number: "some number"}
+    @update_attrs %{addr: "some updated addr", content: "some updated content", number: "some updated number"}
+    @invalid_attrs %{addr: nil, content: nil, number: nil}
+
+    def abi_fixture(attrs \\ %{}) do
+      {:ok, abi} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Chain.create_abi()
+
+      abi
+    end
+
+    test "list_abis/0 returns all abis" do
+      abi = abi_fixture()
+      assert Chain.list_abis() == [abi]
+    end
+
+    test "get_abi!/1 returns the abi with given id" do
+      abi = abi_fixture()
+      assert Chain.get_abi!(abi.id) == abi
+    end
+
+    test "create_abi/1 with valid data creates a abi" do
+      assert {:ok, %ABI{} = abi} = Chain.create_abi(@valid_attrs)
+      assert abi.addr == "some addr"
+      assert abi.content == "some content"
+      assert abi.number == "some number"
+    end
+
+    test "create_abi/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Chain.create_abi(@invalid_attrs)
+    end
+
+    test "update_abi/2 with valid data updates the abi" do
+      abi = abi_fixture()
+      assert {:ok, abi} = Chain.update_abi(abi, @update_attrs)
+      assert %ABI{} = abi
+      assert abi.addr == "some updated addr"
+      assert abi.content == "some updated content"
+      assert abi.number == "some updated number"
+    end
+
+    test "update_abi/2 with invalid data returns error changeset" do
+      abi = abi_fixture()
+      assert {:error, %Ecto.Changeset{}} = Chain.update_abi(abi, @invalid_attrs)
+      assert abi == Chain.get_abi!(abi.id)
+    end
+
+    test "delete_abi/1 deletes the abi" do
+      abi = abi_fixture()
+      assert {:ok, %ABI{}} = Chain.delete_abi(abi)
+      assert_raise Ecto.NoResultsError, fn -> Chain.get_abi!(abi.id) end
+    end
+
+    test "change_abi/1 returns a abi changeset" do
+      abi = abi_fixture()
+      assert %Ecto.Changeset{} = Chain.change_abi(abi)
+    end
+  end
 end

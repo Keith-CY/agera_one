@@ -8,6 +8,18 @@ defmodule AgeraOneWeb.RpcController do
   action_fallback(AgeraOneWeb.FallbackController)
 
   @doc false
+  def index(conn, %{"method" => "net_peerCount"}) do
+    case Chain.get_peer_count() do
+      {:ok, peer_count} ->
+        conn
+        |> render(MetadataView, "peer_count.json", peer_count: peer_count)
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  @doc false
   def index(conn, %{"method" => "cita_getMetaData", "params" => [number]}) do
     case Chain.get_metadata(number) do
       {:ok, %Metadata{} = metadata} ->
@@ -16,6 +28,12 @@ defmodule AgeraOneWeb.RpcController do
       {:error, reason} ->
         {:error, reason}
     end
+  end
+
+  @doc false
+  # TODO:
+  def index(conn, %{"method" => "net_peerCount"}) do
+    # Chain.
   end
 
   @doc false

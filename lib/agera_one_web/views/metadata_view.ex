@@ -1,6 +1,12 @@
 defmodule AgeraOneWeb.MetadataView do
   use AgeraOneWeb, :view
 
+  def render("peer_count.json", %{peer_count: peer_count}) do
+    %{
+      result: peer_count
+    }
+  end
+
   def render("metadata.json", %{metadata: metadata}) do
     %{
       chainId: metadata.chain_id,

@@ -11,6 +11,18 @@ defmodule AgeraOne.Chain do
   @chain_url "http://47.75.129.215:1337/"
 
   @doc false
+  def sync_peer_count() do
+    request_chain("net_peerCount")
+  end
+
+  def get_peer_count() do
+    case Repo.one(from(m in Metadata, order_by: [desc: m.timestamp], limit: 1)) do
+      %{peer_count: peer_count} -> {:ok, peer_count}
+      nil -> {:error, :not_found}
+    end
+  end
+
+  @doc false
   def get_metadata(number) do
     case Repo.get_by(Metadata, number: number) do
       %Metadata{} = metadata -> {:ok, metadata}
@@ -19,16 +31,13 @@ defmodule AgeraOne.Chain do
   end
 
   @doc false
+
   def sync_metadata(number) do
-    case request_chain("cita_getMetaData", [number]) do
-      {:ok, %{"validators" => validators} = metadata} when is_list(validators) ->
-        metadata |> Map.put("number", number) |> create_metadata()
-
-      {:error, reason} ->
-        {:error, reason}
-
-      error ->
-        {:error, error}
+    with {:ok, metadata} <- request_chain("cita_getMetaData", [number]),
+         {:ok, peer_count} <- sync_peer_count() do
+      metadata |> Map.put("number", number) |> Map.put("peerCount", peer_count) |> create_metadata
+    else
+      error -> {:error, error}
     end
   end
 
@@ -208,11 +217,6 @@ defmodule AgeraOne.Chain do
     Header.changeset(header, %{})
   end
 
-  @doc false
-  def request_peer_count() do
-    request_chain("net_peerCount")
-  end
-
   @doc """
     Request chain
   """
@@ -378,12 +382,11 @@ defmodule AgeraOne.Chain do
   end
 
   def get_time(timestamp) do
-    case DateTime.from_unix(timestamp, :microsecond) do
+    case DateTime.from_unix(timestamp, :millisecond) do
       {:ok, time} ->
-        # DateTime.to_string(time)
         time
 
-      {:error, reason} ->
+      _ ->
         timestamp
     end
   end
@@ -407,5 +410,101 @@ defmodule AgeraOne.Chain do
 
   def hex_to_int(hex) do
     hex
+  end
+
+  alias AgeraOne.Chain.ABI
+
+  @doc """
+  Returns the list of abis.
+
+  ## Examples
+
+      iex> list_abis()
+      [%ABI{}, ...]
+
+  """
+  def list_abis do
+    Repo.all(ABI)
+  end
+
+  @doc """
+  Gets a single abi.
+
+  Raises `Ecto.NoResultsError` if the Abi does not exist.
+
+  ## Examples
+
+      iex> get_abi!(123)
+      %ABI{}
+
+      iex> get_abi!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_abi!(id), do: Repo.get!(ABI, id)
+
+  @doc """
+  Creates a abi.
+
+  ## Examples
+
+      iex> create_abi(%{field: value})
+      {:ok, %ABI{}}
+
+      iex> create_abi(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_abi(attrs \\ %{}) do
+    %ABI{}
+    |> ABI.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a abi.
+
+  ## Examples
+
+      iex> update_abi(abi, %{field: new_value})
+      {:ok, %ABI{}}
+
+      iex> update_abi(abi, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_abi(%ABI{} = abi, attrs) do
+    abi
+    |> ABI.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a ABI.
+
+  ## Examples
+
+      iex> delete_abi(abi)
+      {:ok, %ABI{}}
+
+      iex> delete_abi(abi)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_abi(%ABI{} = abi) do
+    Repo.delete(abi)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking abi changes.
+
+  ## Examples
+
+      iex> change_abi(abi)
+      %Ecto.Changeset{source: %ABI{}}
+
+  """
+  def change_abi(%ABI{} = abi) do
+    ABI.changeset(abi, %{})
   end
 end
