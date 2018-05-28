@@ -13,6 +13,7 @@ defmodule AgeraOne.Chain.Transaction do
     field(:contract_address, :string)
     field(:gas_used, :string)
     field(:index, :string)
+    field(:from, :string)
     field(:to, :string)
     field(:data, :binary)
     belongs_to(:block, Block)
@@ -40,6 +41,7 @@ defmodule AgeraOne.Chain.Transaction do
 
   def add_transaction_detail(transaction) do
     {:ok, sig, tx} = Message.parse_unverified_transaction(transaction.content)
+    {:ok, from} = Message.get_from(transaction.content)
 
     tx_detail =
       case(tx) do
@@ -54,14 +56,16 @@ defmodule AgeraOne.Chain.Transaction do
             nonce: nonce,
             data: data,
             valid_until_block: valid_until_block,
-            data: data
+            from: from
           }
 
         tx ->
           tx
       end
 
+    IO.inspect(tx_detail)
+
     transaction
-    |> cast(tx_detail, [:to, :data])
+    |> cast(tx_detail, [:to, :data, :from])
   end
 end

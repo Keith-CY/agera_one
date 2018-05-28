@@ -53,7 +53,14 @@ defmodule AgeraOne.Chain.Message do
 
     case ExthCrypto.Signature.recover(tx_hash, sig, id) do
       {:ok, pubkey} ->
-        pubkey |> String.slice(1..-1) |> ExthCrypto.Hash.Keccak.kec() |> String.slice(-20..-1)
+        {:ok,
+         "0x" <>
+           (pubkey
+            |> String.slice(1..-1)
+            |> ExthCrypto.Hash.Keccak.kec()
+            #  |> String.slice(-20..-1)
+            |> Base.encode16(case: :lower)
+            |> String.slice(-40..-1))}
     end
   end
 end

@@ -323,17 +323,22 @@ defmodule AgeraOne.Chain do
       [%Transaction{}, ...]
 
   """
-  def list_transactions do
-    Repo.all(Transaction)
+  def list_transactions(limit \\ 10, offset \\ 0) do
+    Repo.all(Transaction, limit: limit, offset: offset)
   end
 
   @doc """
   """
-  def list_page_transactions(offset \\ 0, limit \\ 10) do
-    Repo.all(from(t in Transaction, limit: ^limit, offset: ^offset)) |> Repo.preload([:block])
+  def get_transactions(%{offset: offset, limit: limit, from: from}) do
+    case Repo.all(from(t in Transaction, where: t.from == ^from, limit: ^limit, offset: ^offset))
+         |> Repo.preload([:block]) do
+      nil -> {:error, :not_found}
+      transactions -> {:ok, transactions}
+    end
   end
 
   @doc false
+
   def get_transaction(%{hash: hash}) do
     case Repo.get_by(Transaction, hash: hash) do
       nil ->

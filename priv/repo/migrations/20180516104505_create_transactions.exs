@@ -10,6 +10,7 @@ defmodule AgeraOne.Repo.Migrations.CreateTransactions do
       add(:contract_address, :string)
       add(:gas_used, :string)
       add(:index, :string)
+      add(:from, :string)
       add(:to, :string)
       add(:data, :binary)
       add(:block_id, references(:blocks, on_delete: :delete_all))
