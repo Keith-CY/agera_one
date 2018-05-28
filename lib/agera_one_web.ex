@@ -38,7 +38,6 @@ defmodule AgeraOneWeb do
       import AgeraOneWeb.Router.Helpers
       import AgeraOneWeb.ErrorHelpers
       import AgeraOneWeb.Gettext
-      import AgeraOneWeb.JSONHelpers
     end
   end
 

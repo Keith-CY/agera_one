@@ -12,7 +12,6 @@ defmodule AgeraOneWeb.HeaderView do
 
   def render("header.json", %{header: header}) do
     %{
-      # id: header.id,
       timestamp: header.timestamp,
       prevHash: header.prev_hash,
       number: header.number |> int_to_hex(),

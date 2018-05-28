@@ -90,26 +90,34 @@ defmodule AgeraOneWeb.RpcController do
 
   @doc false
   def index(conn, %{"method" => "cita_getBlockByNumber", "params" => [number, detailed]}) do
-    block = get_block_by(%{number: number})
+    case get_block_by(%{number: number}) do
+      {:ok, block} ->
+        render_block(conn, block, detailed)
 
-    render_block(conn, block, detailed)
+      error ->
+        IO.inspect(error)
+        error
+    end
   end
 
   @doc false
   def index(conn, %{"method" => "cita_getBlockByHash", "params" => [hash, detailed]}) do
-    block = get_block_by(%{hash: hash})
+    case get_block_by(%{hash: hash}) do
+      {:ok, block} ->
+        render_block(conn, block, detailed)
 
-    render_block(conn, block, detailed)
+      error ->
+        error
+    end
   end
 
   @doc false
-  defp get_block_by(params) do
+  def get_block_by(params) do
     case Chain.get_block(params) do
       {:ok, %Block{} = block} ->
-        block |> Repo.preload([:transactions])
+        {:ok, block |> Repo.preload([:transactions])}
 
       error ->
-        IO.inspect(error)
         error
     end
   end

@@ -1,4 +1,6 @@
 defmodule AgeraOneWeb.Gettext do
+  alias AgeraOne.Chain
+
   @moduledoc """
   A module providing Internationalization with a gettext-based API.
 
@@ -21,4 +23,12 @@ defmodule AgeraOneWeb.Gettext do
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
   use Gettext, otp_app: :agera_one
+
+  def hex_to_int(hex) do
+    hex |> Chain.hex_to_int()
+  end
+
+  def int_to_hex(int) do
+    int |> Chain.int_to_hex()
+  end
 end

@@ -22,8 +22,9 @@ defmodule AgeraOne.Chain.Transaction do
   @doc false
   def changeset(transaction, attrs) do
     transaction
+    |> Map.put(:block_number, transaction.block_number |> Chain.hex_to_int())
     |> add_transaction_detail
-    |> cast(%{attrs | "block_number" => attrs["block_number"] |> Chain.hex_to_int()}, [
+    |> cast(attrs, [
       :hash,
       :content,
       :block_hash,
@@ -41,13 +42,25 @@ defmodule AgeraOne.Chain.Transaction do
 
     tx_detail =
       case(tx) do
-        %{data: data, nonce: nonce, valid_until_block: valid_until_block, to: to} ->
-          %{to: to, nonce: nonce, data: data, valid_until_block: valid_until_block, data: data}
+        %{
+          data: data,
+          nonce: nonce,
+          valid_until_block: valid_until_block,
+          to: to
+        } ->
+          %{
+            to: to,
+            nonce: nonce,
+            data: data,
+            valid_until_block: valid_until_block,
+            data: data
+          }
 
         tx ->
           tx
       end
 
-    transaction |> cast(tx_detail, [:to])
+    transaction
+    |> cast(tx_detail, [:to])
   end
 end

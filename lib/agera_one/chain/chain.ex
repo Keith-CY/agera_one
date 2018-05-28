@@ -16,7 +16,7 @@ defmodule AgeraOne.Chain do
   end
 
   def get_peer_count() do
-    case Repo.one(from(m in Metadata, order_by: [desc: m.number], select: m.peer_count)) do
+    case Repo.one(from(m in Metadata, order_by: [desc: m.number], select: m.peer_count, limit: 1)) do
       nil -> {:error, :not_found}
       peer_count -> {:ok, peer_count}
     end
@@ -93,7 +93,7 @@ defmodule AgeraOne.Chain do
       %{block: block} ->
         {:ok, block |> Repo.preload([:header])}
 
-      _ ->
+      nil ->
         case request_chain("cita_getBlockByNumber", [number |> int_to_hex(), false]) do
           {:ok, data} ->
             cache_block(data)
@@ -229,6 +229,10 @@ defmodule AgeraOne.Chain do
     result
   end
 
+  def cache_block(block) do
+    block
+  end
+
   def sync_block() do
     current =
       case get_latest_block_header() do
@@ -236,7 +240,8 @@ defmodule AgeraOne.Chain do
           number
 
         _ ->
-          0
+          # 0
+          207
       end
 
     number = current + 1
@@ -259,8 +264,12 @@ defmodule AgeraOne.Chain do
            HTTPoison.post(@chain_url, rpc_params),
          {:ok, decoded} <- Poison.decode(body),
          %{"result" => result} <- decoded do
-      {:ok, result}
+      cond do
+        is_nil(result) -> {:error, :not_found}
+        true -> {:ok, result}
+      end
     else
+      {:error, reason} -> {:error, reason}
       err -> err
     end
   end
