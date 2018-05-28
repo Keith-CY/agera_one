@@ -5,7 +5,7 @@ defmodule AgeraOne.Repo.Migrations.CreateHeaders do
     create table(:headers) do
       add(:timestamp, :utc_datetime)
       add(:prev_hash, :string)
-      add(:number, :string)
+      add(:number, :integer)
       add(:state_root, :string)
       add(:transactions_root, :string)
       add(:receipts_root, :string)

@@ -11,9 +11,6 @@ defmodule AgeraOneWeb.ABIView do
   end
 
   def render("abi.json", %{abi: abi}) do
-    %{id: abi.id,
-      addr: abi.addr,
-      content: abi.content,
-      number: abi.number}
+    %{id: abi.id, addr: abi.addr, content: abi.content, number: abi.number |> int_to_hex()}
   end
 end

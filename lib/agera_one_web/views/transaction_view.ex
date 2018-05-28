@@ -2,6 +2,12 @@ defmodule AgeraOneWeb.TransactionView do
   use AgeraOneWeb, :view
   alias AgeraOneWeb.TransactionView
 
+  def render("count.json", %{count: count}) do
+    %{
+      result: count
+    }
+  end
+
   def render("index.json", %{transactions: transactions}) do
     %{data: render_many(transactions, TransactionView, "transaction.json")}
   end
@@ -25,7 +31,7 @@ defmodule AgeraOneWeb.TransactionView do
         transactionHash: transaction.hash,
         transactionIndex: transaction.index,
         blockHash: transaction.block_hash,
-        blockNumber: transaction.block_number,
+        blockNumber: transaction.block_number |> int_to_hex(),
         gasUsed: transaction.gas_used,
         contractAddress: transaction.contract_address
       }

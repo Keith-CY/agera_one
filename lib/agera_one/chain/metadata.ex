@@ -10,7 +10,7 @@ defmodule AgeraOne.Chain.Metadata do
     field(:operator, :string)
     field(:validators, :string)
     field(:website, :string)
-    field(:number, :string)
+    field(:number, :integer)
     field(:peer_count, :string)
 
     timestamps()
@@ -60,7 +60,7 @@ defmodule AgeraOne.Chain.Metadata do
       genesis_timestamp: genesis_timestamp |> Chain.get_time(),
       operator: operator,
       website: website,
-      number: number,
+      number: number |> Chain.hex_to_int(),
       validators: validators |> Enum.join(),
       peer_count: peer_count
     }

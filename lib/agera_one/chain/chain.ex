@@ -6,7 +6,7 @@ defmodule AgeraOne.Chain do
   import Ecto.Query, warn: false
   alias AgeraOne.Repo
 
-  alias AgeraOne.Chain.{Block, Header, Transaction, Message, Metadata}
+  alias AgeraOne.Chain.{Block, Header, Transaction, Message, Metadata, ABI}
 
   @chain_url "http://47.75.129.215:1337/"
 
@@ -16,14 +16,16 @@ defmodule AgeraOne.Chain do
   end
 
   def get_peer_count() do
-    case Repo.one(from(m in Metadata, order_by: [desc: m.timestamp], limit: 1)) do
-      %{peer_count: peer_count} -> {:ok, peer_count}
+    case Repo.one(from(m in Metadata, order_by: [desc: m.number], select: m.peer_count)) do
       nil -> {:error, :not_found}
+      peer_count -> {:ok, peer_count}
     end
   end
 
   @doc false
-  def get_metadata(number) do
+  def get_metadata(number \\ "latest") do
+    number = number |> number_formatter() |> hex_to_int()
+
     case Repo.get_by(Metadata, number: number) do
       %Metadata{} = metadata -> {:ok, metadata}
       nil -> {:error, :not_found}
@@ -32,12 +34,40 @@ defmodule AgeraOne.Chain do
 
   @doc false
 
-  def sync_metadata(number) do
+  def sync_metadata(number \\ "latest") do
+    number = number |> number_formatter()
+
     with {:ok, metadata} <- request_chain("cita_getMetaData", [number]),
          {:ok, peer_count} <- sync_peer_count() do
       metadata |> Map.put("number", number) |> Map.put("peerCount", peer_count) |> create_metadata
     else
       error -> {:error, error}
+    end
+  end
+
+  def get_abi(addr, spec_number \\ "latest") do
+    spec_number = spec_number |> number_formatter()
+    abi = Repo.one(ABI, addr: addr)
+
+    if !is_nil(abi) and hex_to_int(abi.number) <= hex_to_int(spec_number) do
+      {:ok, abi.content}
+    else
+      case request_chain("eth_getAbi", [addr, spec_number]) do
+        {:ok, "0x"} ->
+          {:ok, "0x"}
+
+        {:ok, remote_abi} ->
+          cond do
+            is_nil(abi) ->
+              %{content: remote_abi, number: spec_number, addr: addr} |> create_abi
+
+            true ->
+              update_abi(abi, %{number: spec_number, abi: remote_abi})
+          end
+
+        error ->
+          {:error, error}
+      end
     end
   end
 
@@ -64,7 +94,7 @@ defmodule AgeraOne.Chain do
         {:ok, block |> Repo.preload([:header])}
 
       _ ->
-        case request_chain("cita_getBlockByNumber", [number, false]) do
+        case request_chain("cita_getBlockByNumber", [number |> int_to_hex(), false]) do
           {:ok, data} ->
             cache_block(data)
 
@@ -96,7 +126,7 @@ defmodule AgeraOne.Chain do
 
   @doc false
   def get_latest_block_header() do
-    Repo.one(from(h in Header, order_by: [desc: h.timestamp], limit: 1))
+    Repo.one(from(h in Header, order_by: [desc: h.number], limit: 1))
   end
 
   @doc false
@@ -141,8 +171,10 @@ defmodule AgeraOne.Chain do
   end
 
   @doc false
-  def get_header(%{number: number}),
-    do: Repo.get_by(Header, number: number) |> Repo.preload(:block)
+  def get_header(%{number: number}) do
+    number = number |> number_formatter() |> hex_to_int()
+    Repo.get_by(Header, number: number) |> Repo.preload(:block)
+  end
 
   @doc false
   def get_header(id), do: Repo.get(Header, id)
@@ -181,7 +213,7 @@ defmodule AgeraOne.Chain do
       ) do
     header = %Header{
       gas_used: gas_used,
-      number: number,
+      number: number |> hex_to_int(),
       prev_hash: prev_hash,
       proposer: proposer,
       receipts_root: receipts_root,
@@ -201,13 +233,13 @@ defmodule AgeraOne.Chain do
     current =
       case get_latest_block_header() do
         %Header{number: number} ->
-          hex_to_int(number)
+          number
 
         _ ->
           0
       end
 
-    number = (current + 1) |> int_to_hex
+    number = current + 1
     sync_metadata(number)
     get_block(%{number: number})
   end
@@ -233,13 +265,12 @@ defmodule AgeraOne.Chain do
     end
   end
 
-  @doc """
-  JSON RPC Params Formatter
+  def get_transaction_count(addr, number \\ "latest") do
+    number = number |> number_formatter()
+    request_chain("eth_getTransactionCount", [addr, number])
+  end
 
-  ## Example
-    iex> json_rpc_params(%{method: "M", params: "P"})
-    %{id: 1, jsonrpc: "2.0", method: "M", params: ["P"]}
-  """
+  @doc false
   def json_rpc_params(method, params \\ []) do
     Poison.encode!(%{
       jsonrpc: "2.0",
@@ -247,6 +278,22 @@ defmodule AgeraOne.Chain do
       params: params,
       id: 1
     })
+  end
+
+  def number_formatter(number) do
+    cond do
+      number == "latest" ->
+        case get_latest_block_header() do
+          %Header{number: number} -> number |> int_to_hex()
+          _ -> "0x0"
+        end
+
+      number == "earliest" ->
+        "0x0"
+
+      true ->
+        number |> int_to_hex()
+    end
   end
 
   alias AgeraOne.Chain.Transaction

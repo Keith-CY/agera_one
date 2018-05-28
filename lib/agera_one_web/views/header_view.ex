@@ -15,7 +15,7 @@ defmodule AgeraOneWeb.HeaderView do
       # id: header.id,
       timestamp: header.timestamp,
       prevHash: header.prev_hash,
-      number: header.number,
+      number: header.number |> int_to_hex(),
       stateRoot: header.state_root,
       transactionsRoot: header.transactions_root,
       receiptsRoot: header.receipts_root,

@@ -3,12 +3,11 @@ defmodule AgeraOne.Repo.Migrations.CreateAbis do
 
   def change do
     create table(:abis) do
-      add :addr, :string
-      add :content, :string
-      add :number, :string
+      add(:addr, :string)
+      add(:content, :text)
+      add(:number, :integer)
 
       timestamps()
     end
-
   end
 end

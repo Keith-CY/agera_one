@@ -1,6 +1,7 @@
 defmodule AgeraOne.Chain.Transaction do
   use Ecto.Schema
   import Ecto.Changeset
+  alias AgeraOne.Chain
   alias AgeraOne.Chain.Block
   alias AgeraOne.Chain.Message
 
@@ -8,7 +9,7 @@ defmodule AgeraOne.Chain.Transaction do
     field(:content, :string)
     field(:hash, :string)
     field(:block_hash, :string)
-    field(:block_number, :string)
+    field(:block_number, :integer)
     field(:contract_address, :string)
     field(:gas_used, :string)
     field(:index, :string)
@@ -22,7 +23,7 @@ defmodule AgeraOne.Chain.Transaction do
   def changeset(transaction, attrs) do
     transaction
     |> add_transaction_detail
-    |> cast(attrs, [
+    |> cast(%{attrs | "block_number" => attrs["block_number"] |> Chain.hex_to_int()}, [
       :hash,
       :content,
       :block_hash,

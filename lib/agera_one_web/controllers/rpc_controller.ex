@@ -31,9 +31,16 @@ defmodule AgeraOneWeb.RpcController do
   end
 
   @doc false
-  # TODO:
-  def index(conn, %{"method" => "net_peerCount"}) do
-    # Chain.
+  def index(conn, %{"method" => "eth_getAbi", "params" => [address, number]}) do
+    {:error, :not_found}
+  end
+
+  @doc false
+  def index(conn, %{"method" => "eth_getTransactionCount", "params" => [addr, number]}) do
+    case Chain.get_transaction_count(addr, number) do
+      {:ok, count} -> conn |> render(TransactionView, "count.json", count: count)
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc false

@@ -28,8 +28,9 @@ defmodule AgeraOneWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/agera_one_web/templates",
-                        namespace: AgeraOneWeb
+      use Phoenix.View,
+        root: "lib/agera_one_web/templates",
+        namespace: AgeraOneWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
@@ -37,6 +38,7 @@ defmodule AgeraOneWeb do
       import AgeraOneWeb.Router.Helpers
       import AgeraOneWeb.ErrorHelpers
       import AgeraOneWeb.Gettext
+      import AgeraOneWeb.JSONHelpers
     end
   end
 

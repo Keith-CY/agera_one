@@ -6,7 +6,7 @@ defmodule AgeraOne.Repo.Migrations.CreateTransactions do
       add(:hash, :string)
       add(:content, :text)
       add(:block_hash, :string)
-      add(:block_number, :string)
+      add(:block_number, :integer)
       add(:contract_address, :string)
       add(:gas_used, :string)
       add(:index, :string)

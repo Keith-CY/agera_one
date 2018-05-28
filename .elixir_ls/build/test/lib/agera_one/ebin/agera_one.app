@@ -41,6 +41,7 @@
                         'Elixir.AgeraOneWeb.FallbackController',
                         'Elixir.AgeraOneWeb.Gettext',
                         'Elixir.AgeraOneWeb.HeaderView',
+                        'Elixir.AgeraOneWeb.JSONHelpers',
                         'Elixir.AgeraOneWeb.MetadataView',
                         'Elixir.AgeraOneWeb.Router',
                         'Elixir.AgeraOneWeb.Router.Helpers',

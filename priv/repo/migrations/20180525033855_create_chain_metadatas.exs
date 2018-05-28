@@ -9,7 +9,7 @@ defmodule AgeraOne.Repo.Migrations.CreateChainMetadatas do
       add(:operator, :string)
       add(:validators, :string)
       add(:website, :string)
-      add(:number, :string)
+      add(:number, :integer)
       add(:peer_count, :string)
 
       timestamps()

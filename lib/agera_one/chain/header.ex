@@ -1,11 +1,12 @@
 defmodule AgeraOne.Chain.Header do
   use Ecto.Schema
   import Ecto.Changeset
+  alias AgeraOne.Chain
   alias AgeraOne.Chain.Block
 
   schema "headers" do
     field(:gas_used, :string)
-    field(:number, :string)
+    field(:number, :integer)
     field(:prev_hash, :string)
     field(:proposer, :string)
     field(:receipts_root, :string)
@@ -20,7 +21,7 @@ defmodule AgeraOne.Chain.Header do
   @doc false
   def changeset(header, attrs) do
     header
-    |> cast(attrs, [
+    |> cast(%{attrs | "number" => attrs["number"] |> Chain.hex_to_int()}, [
       :timestamp,
       :prev_hash,
       :number,
