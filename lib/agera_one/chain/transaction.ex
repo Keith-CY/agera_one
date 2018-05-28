@@ -14,6 +14,7 @@ defmodule AgeraOne.Chain.Transaction do
     field(:gas_used, :string)
     field(:index, :string)
     field(:to, :string)
+    field(:data, :binary)
     belongs_to(:block, Block)
 
     timestamps()
@@ -61,6 +62,6 @@ defmodule AgeraOne.Chain.Transaction do
       end
 
     transaction
-    |> cast(tx_detail, [:to])
+    |> cast(tx_detail, [:to, :data])
   end
 end

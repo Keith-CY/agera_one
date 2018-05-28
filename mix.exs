@@ -41,7 +41,11 @@ defmodule AgeraOne.Mixfile do
       {:cowboy, "~> 1.0"},
       {:httpoison, "~> 1.0"},
       {:poison, "~> 3.1"},
-      {:exprotobuf, "~> 1.2.9"}
+      {:exprotobuf, "~> 1.2.9"},
+      {:keccak, "~> 2.0"},
+      {:sha3, "~> 2.0"},
+      {:exth_crypto, "~> 0.1.3"}
+
       # {:google_protos, "~> 0.1"}
     ]
   end

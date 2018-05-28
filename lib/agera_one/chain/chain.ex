@@ -11,6 +11,13 @@ defmodule AgeraOne.Chain do
   @chain_url "http://47.75.129.215:1337/"
 
   @doc false
+  def sync_10() do
+    for _ <- 1..10 do
+      sync_block()
+    end
+  end
+
+  @doc false
   def sync_peer_count() do
     request_chain("net_peerCount")
   end
