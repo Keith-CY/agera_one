@@ -90,8 +90,11 @@ defmodule AgeraOne.Chain do
   end
 
   @doc false
-  def list_page_blocks(offset \\ 0, limit \\ 10) do
-    Repo.all(from(b in Block, offset: ^offset, limit: ^limit)) |> Repo.preload([:header])
+  def get_blocks(offset \\ 0, limit \\ 10) do
+    case Repo.all(from(b in Block, offset: ^offset, limit: ^limit)) |> Repo.preload([:header]) do
+      nil -> {:error, :not_found}
+      blocks -> {:ok, blocks}
+    end
   end
 
   @doc false
