@@ -21,6 +21,7 @@ message BlockHeader {
     uint64 gas_used = 7;
     uint64 gas_limit = 8;
     Proof proof = 9;
+    bytes proposer = 10;
 }
 
 message Status {
@@ -37,6 +38,7 @@ message RichStatus {
     bytes hash = 1;
     uint64 height = 2;
     repeated bytes nodes = 3;
+    uint64 interval = 4;
 }
 
 enum Crypto {
@@ -50,7 +52,9 @@ message Transaction {
     uint64 quota = 3;
     uint64 valid_until_block = 4;
     bytes data = 5;
-    uint32 version = 6;
+    uint64 value = 6;
+    uint32 chain_id = 7;
+    uint32 version = 8;
 }
 
 message UnverifiedTransaction {

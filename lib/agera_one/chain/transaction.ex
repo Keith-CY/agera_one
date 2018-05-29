@@ -16,6 +16,7 @@ defmodule AgeraOne.Chain.Transaction do
     field(:from, :string)
     field(:to, :string)
     field(:data, :binary)
+    field(:value, :integer)
     belongs_to(:block, Block)
 
     timestamps()
@@ -49,23 +50,23 @@ defmodule AgeraOne.Chain.Transaction do
           data: data,
           nonce: nonce,
           valid_until_block: valid_until_block,
-          to: to
+          to: to,
+          value: value
         } ->
           %{
             to: to,
             nonce: nonce,
             data: data,
             valid_until_block: valid_until_block,
-            from: from
+            from: from,
+            value: value
           }
 
         tx ->
           tx
       end
 
-    IO.inspect(tx_detail)
-
     transaction
-    |> cast(tx_detail, [:to, :data, :from])
+    |> cast(tx_detail, [:to, :data, :from, :value])
   end
 end
