@@ -14,11 +14,12 @@ defmodule AgeraOne.Chain.ABI do
   @doc false
   def changeset(abi, attrs) do
     abi
-    |> cast(%{attrs | "number" => attrs["number"] |> Chain.hex_to_int()}, [
+    |> cast(%{attrs | number: attrs.number |> Chain.hex_to_int()}, [
       :addr,
       :content,
       :number
     ])
     |> validate_required([:addr, :content, :number])
+    |> unique_constraint(:addr)
   end
 end

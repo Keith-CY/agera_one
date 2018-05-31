@@ -6,7 +6,7 @@ defmodule AgeraOne.Chain do
   import Ecto.Query, warn: false
   alias AgeraOne.Repo
 
-  alias AgeraOne.Chain.{Block, Header, Transaction, Message, Metadata, ABI}
+  alias AgeraOne.Chain.{Block, Header, Transaction, Message, Metadata, ABI, Balance}
 
   @chain_url "http://47.75.129.215:1337/"
 
@@ -57,11 +57,13 @@ defmodule AgeraOne.Chain do
     abi = Repo.one(ABI, addr: addr)
 
     if !is_nil(abi) and hex_to_int(abi.number) <= hex_to_int(spec_number) do
-      {:ok, abi.content}
+      {:ok, abi}
     else
+      IO.puts("Requesting ABI at addr: #{addr}, number: #{spec_number}")
+
       case request_chain("eth_getAbi", [addr, spec_number]) do
         {:ok, "0x"} ->
-          {:ok, "0x"}
+          {:ok, %{content: "0x", addr: addr, number: spec_number |> int_to_hex()}}
 
         {:ok, remote_abi} ->
           cond do
@@ -69,7 +71,36 @@ defmodule AgeraOne.Chain do
               %{content: remote_abi, number: spec_number, addr: addr} |> create_abi
 
             true ->
-              update_abi(abi, %{number: spec_number, abi: remote_abi})
+              update_abi(abi, %{number: spec_number, content: remote_abi})
+          end
+
+        error ->
+          {:error, error}
+      end
+    end
+  end
+
+  @doc false
+  def get_balance(addr, spec_number \\ "latest") do
+    spec_number = spec_number |> number_formatter()
+    balance = Repo.one(Balance, addr: addr)
+
+    if !is_nil(balance) and hex_to_int(balance.number) >= hex_to_int(spec_number) do
+      {:ok, balance}
+    else
+      IO.puts("Requesting Balance at addr: #{addr}, number: #{spec_number}")
+
+      case request_chain("eth_getBalance", [addr, spec_number]) do
+        {:ok, "0x"} ->
+          {:ok, %{value: "0x0", addr: addr, spec_number: spec_number |> int_to_hex()}}
+
+        {:ok, remote_balance} ->
+          cond do
+            is_nil(balance) ->
+              %{value: remote_balance, number: spec_number, addr: addr} |> create_balance
+
+            true ->
+              update_balance(balance, %{number: spec_number, value: remote_balance})
           end
 
         error ->
@@ -511,16 +542,6 @@ defmodule AgeraOne.Chain do
   def get_abi!(id), do: Repo.get!(ABI, id)
 
   @doc """
-  Creates a abi.
-
-  ## Examples
-
-      iex> create_abi(%{field: value})
-      {:ok, %ABI{}}
-
-      iex> create_abi(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
   def create_abi(attrs \\ %{}) do
     %ABI{}
@@ -530,15 +551,6 @@ defmodule AgeraOne.Chain do
 
   @doc """
   Updates a abi.
-
-  ## Examples
-
-      iex> update_abi(abi, %{field: new_value})
-      {:ok, %ABI{}}
-
-      iex> update_abi(abi, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
   def update_abi(%ABI{} = abi, attrs) do
     abi
@@ -573,5 +585,22 @@ defmodule AgeraOne.Chain do
   """
   def change_abi(%ABI{} = abi) do
     ABI.changeset(abi, %{})
+  end
+
+  @doc """
+  """
+  def create_balance(attrs \\ %{}) do
+    %Balance{}
+    |> Balance.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a abi.
+  """
+  def update_balance(%Balance{} = balance, attrs) do
+    balance
+    |> Balance.changeset(attrs)
+    |> Repo.update()
   end
 end

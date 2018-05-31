@@ -3,7 +3,7 @@ defmodule AgeraOneWeb.RpcController do
   alias AgeraOne.Chain
   alias AgeraOne.Repo
   alias AgeraOne.Chain.{Message, Block, Transaction, Metadata}
-  alias AgeraOneWeb.{BlockView, TransactionView, MetadataView}
+  alias AgeraOneWeb.{BlockView, TransactionView, MetadataView, ABIView, BalanceView}
 
   action_fallback(AgeraOneWeb.FallbackController)
 
@@ -32,7 +32,18 @@ defmodule AgeraOneWeb.RpcController do
 
   @doc false
   def index(conn, %{"method" => "eth_getAbi", "params" => [address, number]}) do
-    {:error, :not_found}
+    case Chain.get_abi(address, number) do
+      {:ok, abi} -> conn |> render(ABIView, "abi.json", abi: abi)
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc false
+  def index(conn, %{"method" => "eth_getBalance", "params" => [address, number]}) do
+    case Chain.get_balance(address, number) do
+      {:ok, balance} -> conn |> render(BalanceView, "balance.json", balance: balance)
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc false
