@@ -17,8 +17,6 @@ defmodule AgeraOneWeb.TransactionView do
   end
 
   def render("transaction.json", %{transaction: transaction}) do
-    IO.inspect(transaction)
-
     %{
       hash: transaction.hash,
       content: transaction.content,

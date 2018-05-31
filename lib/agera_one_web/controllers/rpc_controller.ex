@@ -95,7 +95,6 @@ defmodule AgeraOneWeb.RpcController do
         render_block(conn, block, detailed)
 
       error ->
-        IO.inspect(error)
         error
     end
   end

@@ -11,8 +11,6 @@ defmodule AgeraOneWeb.ErrorView do
   # the template name. For example, "404.json" becomes
   # "Not Found".
   def render("msg.json", %{msg: msg}) do
-    IO.inspect(msg)
-
     %{
       error: %{
         message: msg

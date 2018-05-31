@@ -148,7 +148,7 @@ defmodule AgeraOne.Chain do
       Enum.map(tx_hashes, fn tx_hash ->
         case get_transaction(%{hash: tx_hash}) do
           {:ok, tx} -> tx |> change_transaction
-          {:error, error} -> IO.inspect(error)
+          {:error, error} -> IO.inspect({:chain, error})
         end
       end)
     )
