@@ -318,22 +318,18 @@ defmodule AgeraOne.Chain do
   alias AgeraOne.Chain.Transaction
 
   @doc """
-  Returns the list of transactions.
-
-  ## Examples
-
-      iex> list_transactions()
-      [%Transaction{}, ...]
-
-  """
-  def list_transactions(limit \\ 10, offset \\ 0) do
-    Repo.all(Transaction, limit: limit, offset: offset)
-  end
-
-  @doc """
   """
   def get_transactions(%{offset: offset, limit: limit, from: from}) do
     case Repo.all(from(t in Transaction, where: t.from == ^from, limit: ^limit, offset: ^offset))
+         |> Repo.preload([:block]) do
+      nil -> {:error, :not_found}
+      transactions -> {:ok, transactions}
+    end
+  end
+
+  @doc false
+  def get_transactions(limit \\ 10, offset \\ 0) do
+    case Repo.all(from(t in Transaction, limit: ^limit, offset: ^offset))
          |> Repo.preload([:block]) do
       nil -> {:error, :not_found}
       transactions -> {:ok, transactions}

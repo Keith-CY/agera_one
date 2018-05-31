@@ -19,8 +19,15 @@ defmodule AgeraOneWeb.TransactionController do
     end
   end
 
+  def index(conn, %{"limit" => limit, "offset" => offset}) do
+    case(Chain.get_transactions(offset, limit)) do
+      {:ok, transactions} -> render(conn, "index.json", transactions: transactions)
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   def index(conn, _params) do
-    case(Chain.list_transactions()) do
+    case(Chain.get_transactions()) do
       {:ok, transactions} -> render(conn, "index.json", transactions: transactions)
       {:error, reason} -> {:error, reason}
     end
