@@ -44,11 +44,20 @@ defmodule AgeraOne.Chain do
   def sync_metadata(number \\ "latest") do
     number = number |> number_formatter()
 
-    with {:ok, metadata} <- request_chain("cita_getMetaData", [number]),
-         {:ok, peer_count} <- sync_peer_count() do
-      metadata |> Map.put("number", number) |> Map.put("peerCount", peer_count) |> create_metadata
-    else
-      error -> {:error, error}
+    case get_metadata(number) do
+      {:ok, metadata} ->
+        {:ok, metadata}
+
+      _ ->
+        with {:ok, metadata} <- request_chain("cita_getMetaData", [number]),
+             {:ok, peer_count} <- sync_peer_count() do
+          metadata
+          |> Map.put("number", number)
+          |> Map.put("peerCount", peer_count)
+          |> create_metadata
+        else
+          error -> {:error, error}
+        end
     end
   end
 
