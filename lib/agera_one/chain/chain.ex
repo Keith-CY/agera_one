@@ -367,7 +367,7 @@ defmodule AgeraOne.Chain do
     IO.inspect("get_transaction 1")
 
     case Repo.all(from(t in Transaction, where: t.from == ^from, limit: ^limit, offset: ^offset))
-         |> Repo.preload([:block]) do
+         |> Repo.preload([:block, block: :header]) do
       nil -> {:error, :not_found}
       transactions -> {:ok, transactions}
     end
