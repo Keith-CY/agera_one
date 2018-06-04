@@ -140,10 +140,10 @@ defmodule AgeraOne.Chain do
   @doc false
   def get_block(%{number: number}) do
     case get_header(%{number: number}) do
-      %{block: block} ->
-        {:ok, block |> Repo.preload([:header])}
+      {:ok, header} ->
+        {:ok, header |> Repo.preload([:block]) |> Map.get(:block) |> Map.put(:heaer, header)}
 
-      nil ->
+      _ ->
         case request_chain("cita_getBlockByNumber", [number |> int_to_hex(), false]) do
           {:ok, data} ->
             cache_block(data)
@@ -223,7 +223,11 @@ defmodule AgeraOne.Chain do
   @doc false
   def get_header(%{number: number}) do
     number = number |> number_formatter() |> hex_to_int()
-    Repo.get_by(Header, number: number) |> Repo.preload(:block)
+
+    case Repo.get_by(Header, number: number) |> Repo.preload(:block) do
+      nil -> {:error, :not_found}
+      header -> {:ok, header}
+    end
   end
 
   @doc false
@@ -360,6 +364,8 @@ defmodule AgeraOne.Chain do
   @doc """
   """
   def get_transactions(%{offset: offset, limit: limit, from: from}) do
+    IO.inspect("get_transaction 1")
+
     case Repo.all(from(t in Transaction, where: t.from == ^from, limit: ^limit, offset: ^offset))
          |> Repo.preload([:block]) do
       nil -> {:error, :not_found}

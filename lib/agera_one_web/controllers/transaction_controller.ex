@@ -14,8 +14,11 @@ defmodule AgeraOneWeb.TransactionController do
         from: from
       })
     ) do
-      {:ok, transactions} -> render(conn, "index.json", transactions: transactions)
-      {:error, reason} -> {:error, reason}
+      {:ok, transactions} ->
+        render(conn, "index.json", transactions: transactions)
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 

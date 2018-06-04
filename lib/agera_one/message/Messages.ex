@@ -45,8 +45,16 @@ defmodule AgeraOne.Chain.Message do
   def get_from(content) do
     {:ok, sig, tx} = parse_unverified_transaction(content)
 
-    tx_hash =
-      tx |> Message.Transaction.encode() |> String.slice(4..-3) |> ExthCrypto.Hash.Keccak.kec()
+    hex1 =
+      tx |> Message.Transaction.encode() |> String.slice(4..-7) |> ExthCrypto.Math.bin_to_hex()
+
+    hex2 =
+      tx |> Message.Transaction.encode() |> String.slice(-4..-3) |> ExthCrypto.Math.bin_to_hex()
+
+    # tx_hash =
+    #   tx |> Message.Transaction.encode() |> String.slice(4..-3) |> ExthCrypto.Hash.Keccak.kec()
+    tx_hash = hex1 <> hex2
+    msg = tx_hash |> ExthCrypto.Math.hex_to_bin()
 
     r = sig |> String.slice(0..31)
     s = sig |> String.slice(32..63)
@@ -54,7 +62,7 @@ defmodule AgeraOne.Chain.Message do
 
     IO.inspect("r is #{r}, and s is #{s}")
 
-    case ExthCrypto.Signature.recover(tx_hash, sig, v) do
+    case ExthCrypto.Signature.recover(msg, sig, v) do
       {:ok, pubkey} ->
         {:ok,
          "0x" <>
