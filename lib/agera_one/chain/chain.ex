@@ -361,6 +361,21 @@ defmodule AgeraOne.Chain do
 
   alias AgeraOne.Chain.Transaction
 
+  def get_transaction(%{account: account, offset: offset, limit: limit}) do
+    case Repo.all(
+           from(
+             t in Transaction,
+             where: t.from == ^account or t.to == ^account,
+             order_by: [desc: :block_number, asc: :index],
+             limit: ^limit,
+             offset: ^offset
+           )
+         ) do
+      nil -> {:error, :not_found}
+      transactions -> {:ok, transactions |> Repo.preload([:block, block: :header])}
+    end
+  end
+
   @doc """
   """
   def get_transactions(%{offset: offset, limit: limit, from: from}) do
@@ -372,10 +387,14 @@ defmodule AgeraOne.Chain do
              limit: ^limit,
              offset: ^offset
            )
-         )
-         |> Repo.preload([:block, block: :header]) do
-      nil -> {:error, :not_found}
-      transactions -> {:ok, transactions}
+         ) do
+      nil ->
+        {:error, :not_found}
+
+      transactions ->
+        {:ok,
+         transactions
+         |> Repo.preload([:block, block: :header])}
     end
   end
 
@@ -389,9 +408,9 @@ defmodule AgeraOne.Chain do
              offset: ^offset
            )
          )
-         |> Repo.preload([:block, block: :header]) do
+          do
       nil -> {:error, :not_found}
-      transactions -> {:ok, transactions}
+      transactions -> {:ok, transactions |> Repo.preload([:block, block: :header]) }
     end
   end
 

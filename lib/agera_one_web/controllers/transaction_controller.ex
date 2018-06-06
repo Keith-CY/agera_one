@@ -6,6 +6,19 @@ defmodule AgeraOneWeb.TransactionController do
 
   action_fallback(AgeraOneWeb.FallbackController)
 
+  def index(conn, %{"account" => account} = params) do
+    case(
+      Chain.get_transaction(%{
+        account: account,
+        offset: params["offset"] || 0,
+        limit: params["limit"] || 10
+      })
+    ) do
+      {:ok, transactions} -> render(conn, "index.json", transactions: transactions)
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   def index(conn, %{"from" => from} = params) do
     case(
       Chain.get_transactions(%{
