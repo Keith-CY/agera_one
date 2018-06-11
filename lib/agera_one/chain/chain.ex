@@ -294,8 +294,7 @@ defmodule AgeraOne.Chain do
           number
 
         _ ->
-          # 0
-          207
+          0
       end
 
     number = current + 1

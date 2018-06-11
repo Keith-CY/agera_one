@@ -12,14 +12,18 @@ defmodule AgeraOneWeb.HeaderView do
 
   def render("header.json", %{header: header}) do
     %{
-      timestamp: header.timestamp,
+      timestamp: header.timestamp |> DateTime.to_unix(:millisecond),
       prevHash: header.prev_hash,
       number: header.number |> int_to_hex(),
       stateRoot: header.state_root,
       transactionsRoot: header.transactions_root,
       receiptsRoot: header.receipts_root,
       gasUsed: header.gas_used,
-      proporser: header.proposer
+      proof: %{
+        Tendermint: %{
+          proposal: header.proposer
+        }
+      }
     }
   end
 end

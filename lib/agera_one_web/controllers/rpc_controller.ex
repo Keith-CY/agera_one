@@ -125,7 +125,7 @@ defmodule AgeraOneWeb.RpcController do
   def get_block_by(params) do
     case Chain.get_block(params) do
       {:ok, %Block{} = block} ->
-        {:ok, block |> Repo.preload([:transactions])}
+        {:ok, block |> Repo.preload([:transactions, :header])}
 
       error ->
         error

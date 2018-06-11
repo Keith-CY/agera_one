@@ -27,7 +27,7 @@ defmodule AgeraOneWeb.TransactionView do
       value: transaction.value,
       blockNumber: transaction.block_number |> int_to_hex(),
       gasUsed: transaction.gas_used,
-      timestamp: transaction.block.header.timestamp |> DateTime.to_unix()
+      timestamp: transaction.block.header.timestamp |> DateTime.to_unix(:millisecond)
     }
   end
 

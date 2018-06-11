@@ -11,10 +11,10 @@ defmodule AgeraOne.Application do
       # Start the Ecto repository
       supervisor(AgeraOne.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(AgeraOneWeb.Endpoint, [])
+      supervisor(AgeraOneWeb.Endpoint, []),
       # Start your own worker by calling: AgeraOne.Worker.start_link(arg1, arg2, arg3)
       # worker(AgeraOne.Worker, [arg1, arg2, arg3]),
-      # worker(AgeraOne.Chain.Periodically, [])
+      worker(AgeraOne.Chain.Periodically, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -9,13 +9,15 @@ defmodule AgeraOneWeb.MetadataView do
 
   def render("metadata.json", %{metadata: metadata}) do
     %{
-      chainId: metadata.chain_id,
-      chainName: metadata.chain_name,
-      operator: metadata.operator,
-      validators: metadata.validators |> String.split(),
-      website: metadata.website,
-      genesisTimestamp: metadata.genesis_timestamp,
-      number: metadata.number |> int_to_hex()
+      result: %{
+        chainId: metadata.chain_id,
+        chainName: metadata.chain_name,
+        operator: metadata.operator,
+        validators: metadata.validators |> String.split(),
+        website: metadata.website,
+        genesisTimestamp: metadata.genesis_timestamp,
+        number: metadata.number |> int_to_hex()
+      }
     }
   end
 end
