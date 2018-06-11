@@ -44,7 +44,9 @@ defmodule AgeraOne.Mixfile do
       {:exprotobuf, "~> 1.2.9"},
       {:keccak, "~> 2.0"},
       {:sha3, "~> 2.0"},
-      {:exth_crypto, "~> 0.1.3"}
+      {:exth_crypto, "~> 0.1.3"},
+      {:cors_plug, "~> 1.5"},
+
 
       # {:google_protos, "~> 0.1"}
     ]

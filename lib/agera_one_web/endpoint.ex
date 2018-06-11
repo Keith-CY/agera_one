@@ -35,6 +35,7 @@ defmodule AgeraOneWeb.Endpoint do
     key: "_agera_one_key",
     signing_salt: "MkQixSPE"
 
+  plug CORSPlug
   plug AgeraOneWeb.Router
 
   @doc """
