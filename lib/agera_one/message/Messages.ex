@@ -1,5 +1,5 @@
 defmodule AgeraOne.Chain.Message do
-  use Protobuf, from: Path.expand("./transaction.proto", __DIR__)
+  use Protobuf, from: Path.expand("./cita-proto/blockchain.proto", __DIR__)
   alias AgeraOne.Chain.Message
 
   def parse_unverified_transaction(tx_content) do

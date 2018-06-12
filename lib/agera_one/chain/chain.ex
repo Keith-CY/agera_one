@@ -6,7 +6,7 @@ defmodule AgeraOne.Chain do
   import Ecto.Query, warn: false
   alias AgeraOne.Repo
 
-  alias AgeraOne.Chain.{Block, Header, Transaction, Message, Metadata, ABI, Balance}
+  alias AgeraOne.Chain.{Block, Transaction, Message, Metadata, ABI, Balance}
 
   @chain_url "http://47.75.129.215:1337/"
 
@@ -126,24 +126,89 @@ defmodule AgeraOne.Chain do
 
   @doc false
   def list_blocks do
-    Repo.all(Block) |> Repo.preload([:header, :transactions])
+    Repo.all(Block) |> Repo.preload([:transactions])
+  end
+
+  def get_blocks(%{
+        number_from: number_from,
+        number_to: number_to,
+        transaction_from: transaction_from,
+        transaction_to: transaction_to,
+        offset: offset,
+        limit: limit
+      }) do
+    query = Block
+
+    query =
+      case number_from do
+        nil -> query
+        number_from -> query |> where([b], b.number >= ^number_from)
+      end
+
+    query =
+      case number_to do
+        nil -> query
+        number_to -> query |> where([b], b.number <= ^number_to)
+      end
+
+    query =
+      case transaction_from do
+        nil -> query
+        transaction_from -> query |> where([b], b.transactions_count >= ^transaction_from)
+      end
+
+    query =
+      case transaction_to do
+        nil -> query
+        transaction_to -> query |> where([b], b.transactions_count <= ^transaction_to)
+      end
+
+    offset = offset || 0
+    limit = limit || 10
+    limited_query = query |> offset(^offset) |> limit(^limit)
+    count_query = query |> select([t], count(t.id))
+
+    case limited_query |> Repo.all() do
+      nil -> {:error, :not_found}
+      blocks -> {:ok, blocks, count_query |> Repo.one()}
+    end
+  end
+
+  def get_blocks(%{
+        numberFrom: numberFrom,
+        numberTo: numberTo,
+        transactionFrom: transactionFrom,
+        transactionTo: transactionTo
+      }) do
+    case Repo.all(
+           from(
+             b in Block,
+             where:
+               b.number >= ^numberFrom and b.number <= ^numberTo and
+                 b.transactions_count >= ^transactionFrom and
+                 b.transactions_count <= ^transactionTo,
+             order_by: [desc: :number]
+           )
+         ) do
+      nil -> {:error, :not_found}
+      blocks -> {:ok, blocks, blocks |> Kernal.length()}
+    end
   end
 
   @doc false
   def get_blocks(offset \\ 0, limit \\ 10) do
-    case Repo.all(from(b in Block, offset: ^offset, limit: ^limit)) |> Repo.preload([:header]) do
+    case Repo.all(from(b in Block, offset: ^offset, limit: ^limit, order_by: [desc: :number])) do
       nil -> {:error, :not_found}
-      blocks -> {:ok, blocks}
+      blocks -> {:ok, blocks, Block |> Repo.aggregate(:count, :hash)}
     end
   end
 
   @doc false
   def get_block(%{number: number}) do
-    case get_header(%{number: number}) do
-      {:ok, header} ->
-        {:ok, header |> Repo.preload([:block]) |> Map.get(:block) |> Map.put(:heaer, header)}
+    number = number |> hex_to_int()
 
-      _ ->
+    case Repo.get_by(Block, number: number) do
+      nil ->
         case request_chain("cita_getBlockByNumber", [number |> int_to_hex(), false]) do
           {:ok, data} ->
             cache_block(data)
@@ -151,6 +216,9 @@ defmodule AgeraOne.Chain do
           error ->
             error
         end
+
+      block ->
+        {:ok, block}
     end
   end
 
@@ -158,7 +226,7 @@ defmodule AgeraOne.Chain do
   def get_block(%{hash: hash}) do
     case Repo.get_by(Block, hash: hash) do
       %Block{} = block ->
-        {:ok, block |> Repo.preload([:header])}
+        {:ok, block}
 
       _ ->
         case request_chain("cita_getBlockByHash", [hash, false]) do
@@ -172,15 +240,19 @@ defmodule AgeraOne.Chain do
   end
 
   @doc false
-  def get_block(id), do: Repo.get(Block, id) |> Repo.preload([:header])
+  def get_block(id), do: Repo.get(Block, id)
 
   @doc false
-  def get_latest_block_header() do
-    Repo.one(from(h in Header, order_by: [desc: h.number], limit: 1))
+
+  def get_latest_block_number() do
+    case Repo.one(from(b in Block, order_by: [desc: b.number], limit: 1, select: b.number)) do
+      nil -> {:ok, -1}
+      number -> {:ok, number}
+    end
   end
 
   @doc false
-  def create_block(block_params \\ %{}, header_params, tx_hashes \\ []) do
+  def create_block(block_params \\ %{}, tx_hashes \\ []) do
     %Block{}
     |> Block.changeset(block_params)
     |> Ecto.Changeset.put_assoc(
@@ -192,7 +264,6 @@ defmodule AgeraOne.Chain do
         end
       end)
     )
-    |> Ecto.Changeset.put_assoc(:header, header_params)
     |> Repo.insert()
   end
 
@@ -213,43 +284,6 @@ defmodule AgeraOne.Chain do
     Block.changeset(block, %{})
   end
 
-  alias AgeraOne.Chain.Header
-
-  @doc false
-  def list_headers do
-    Repo.all(Header)
-  end
-
-  @doc false
-  def get_header(%{number: number}) do
-    number = number |> number_formatter() |> hex_to_int()
-
-    case Repo.get_by(Header, number: number) |> Repo.preload(:block) do
-      nil -> {:error, :not_found}
-      header -> {:ok, header}
-    end
-  end
-
-  @doc false
-  def get_header(id), do: Repo.get(Header, id)
-
-  @doc false
-  def create_header(attrs \\ %{}) do
-    %Header{}
-    |> Header.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc false
-  def update_header(%Header{} = header, attrs) do
-    header
-    |> Header.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  cache block into db
-  """
   def cache_block(
         %{
           "body" => body,
@@ -265,21 +299,20 @@ defmodule AgeraOne.Chain do
           }
         } = block
       ) do
-    header = %Header{
-      gas_used: gas_used,
-      number: number |> hex_to_int(),
-      prev_hash: prev_hash,
-      proposer: proposer,
-      receipts_root: receipts_root,
-      timestamp: get_time(timestamp),
-      transactions_root: transactions_root,
-      state_root: state_root
-    }
-
     tx_hashes = Map.get(body, "transactions") || []
-    block = Map.put(block, "transactions_count", Kernel.length(tx_hashes))
 
-    result = create_block(block, header, tx_hashes)
+    block = Map.put(block, "gas_used", gas_used)
+    block = Map.put(block, "prev_hash", prev_hash)
+    block = Map.put(block, "proposer", proposer)
+    block = Map.put(block, "receipts_root", receipts_root)
+    block = Map.put(block, "transactions_root", transactions_root)
+    block = Map.put(block, "state_root", state_root)
+
+    block = Map.put(block, "transactions_count", Kernel.length(tx_hashes))
+    block = Map.put(block, "number", number |> hex_to_int())
+    block = Map.put(block, "timestamp", get_time(timestamp))
+
+    result = create_block(block, tx_hashes)
     result
   end
 
@@ -288,23 +321,11 @@ defmodule AgeraOne.Chain do
   end
 
   def sync_block() do
-    current =
-      case get_latest_block_header() do
-        %Header{number: number} ->
-          number
-
-        _ ->
-          0
-      end
-
+    {:ok, current} = get_latest_block_number()
+    IO.puts(current)
     number = current + 1
     sync_metadata(number)
     get_block(%{number: number})
-  end
-
-  @doc false
-  def change_header(%Header{} = header) do
-    Header.changeset(header, %{})
   end
 
   @doc """
@@ -345,9 +366,9 @@ defmodule AgeraOne.Chain do
   def number_formatter(number) do
     cond do
       number == "latest" ->
-        case get_latest_block_header() do
-          %Header{number: number} -> number |> int_to_hex()
-          _ -> "0x0"
+        case get_latest_block_number() do
+          {:ok, -1} -> "0x0"
+          {:ok, current} -> current |> int_to_hex()
         end
 
       number == "earliest" ->
@@ -360,56 +381,55 @@ defmodule AgeraOne.Chain do
 
   alias AgeraOne.Chain.Transaction
 
-  def get_transaction(%{account: account, offset: offset, limit: limit}) do
-    case Repo.all(
-           from(
-             t in Transaction,
-             where: t.from == ^account or t.to == ^account,
-             order_by: [desc: :block_number, asc: :index],
-             limit: ^limit,
-             offset: ^offset
-           )
-         ) do
+  def get_transactions(%{
+        account: account,
+        from: from,
+        to: to,
+        value_from: value_from,
+        value_to: value_to,
+        offset: offset,
+        limit: limit
+      }) do
+    query = Transaction
+
+    query =
+      case from do
+        nil -> query
+        from -> query |> where([t], t.from == ^from)
+      end
+
+    query =
+      case to do
+        nil -> query
+        to -> query |> where([t], t.to == ^to)
+      end
+
+    query =
+      case account do
+        nil -> query
+        account -> query |> where([t], t.from == ^account or t.to == ^account)
+      end
+
+    query =
+      case value_from do
+        nil -> query
+        value_from -> query |> where([t], t.value >= ^value_from)
+      end
+
+    query =
+      case value_to do
+        nil -> query
+        value_from -> query |> where([t], t.value <= ^value_to)
+      end
+
+    offset = offset || 0
+    limit = limit || 10
+    limited_query = query |> offset(^offset) |> limit(^limit)
+    count_query = query |> select([t], count(t.id))
+
+    case limited_query |> Repo.all() do
       nil -> {:error, :not_found}
-      transactions -> {:ok, transactions |> Repo.preload([:block, block: :header])}
-    end
-  end
-
-  @doc """
-  """
-  def get_transactions(%{offset: offset, limit: limit, from: from}) do
-    case Repo.all(
-           from(
-             t in Transaction,
-             where: t.from == ^from,
-             order_by: [desc: :block_number, asc: :index],
-             limit: ^limit,
-             offset: ^offset
-           )
-         ) do
-      nil ->
-        {:error, :not_found}
-
-      transactions ->
-        {:ok,
-         transactions
-         |> Repo.preload([:block, block: :header])}
-    end
-  end
-
-  @doc false
-  def get_transactions(limit \\ 10, offset \\ 0) do
-    case Repo.all(
-           from(
-             t in Transaction,
-             order_by: [desc: :block_number, asc: :index],
-             limit: ^limit,
-             offset: ^offset
-           )
-         )
-          do
-      nil -> {:error, :not_found}
-      transactions -> {:ok, transactions |> Repo.preload([:block, block: :header]) }
+      transactions -> {:ok, transactions |> Repo.preload([:block]), count_query |> Repo.one()}
     end
   end
 
@@ -421,7 +441,7 @@ defmodule AgeraOne.Chain do
         request_transaction(hash)
 
       transaction ->
-        {:ok, transaction |> Repo.preload([:block, block: :header])}
+        {:ok, transaction |> Repo.preload([:block])}
     end
   end
 

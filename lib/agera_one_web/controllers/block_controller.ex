@@ -6,21 +6,20 @@ defmodule AgeraOneWeb.BlockController do
 
   action_fallback(AgeraOneWeb.FallbackController)
 
-  def index(conn, %{"offset" => offset, "limit" => limit}) do
-    case Chain.get_blocks(offset, limit) do
-      {:ok, blocks} -> conn |> render("index.json", blocks: blocks)
-      error -> error
-    end
-  end
+  def index(conn, params) do
+    case Chain.get_blocks(%{
+           number_from: params["numberFrom"],
+           number_to: params["numberTo"],
+           transaction_from: params["transactionFrom"],
+           transaction_to: params["transactionTo"],
+           offset: params["offset"] || 0,
+           limit: params["limit"] || 10
+         }) do
+      {:ok, blocks, count} ->
+        render(conn, "index.json", blocks: blocks, count: count)
 
-  @doc false
-  def index(conn, _params) do
-    case Chain.get_blocks() do
-      {:ok, blocks} ->
-        conn |> render("index.json", blocks: blocks)
-
-      error ->
-        error
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -38,15 +37,5 @@ defmodule AgeraOneWeb.BlockController do
   def show(conn, %{"id" => id}) do
     block = Chain.get_block(id)
     render(conn, "show.json", block: block)
-  end
-
-  @doc false
-  def query_block(_conn, %{hash: hash}) do
-    Chain.get_block(%{hash: hash})
-  end
-
-  @doc false
-  def query_block(_conn, %{height: height}) do
-    Chain.get_block(%{number: height})
   end
 end

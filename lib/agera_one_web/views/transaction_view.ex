@@ -17,8 +17,6 @@ defmodule AgeraOneWeb.TransactionView do
   end
 
   def render("transaction.json", %{transaction: transaction}) do
-    IO.inspect(transaction.block.header)
-
     %{
       hash: transaction.hash,
       content: transaction.content,
@@ -27,7 +25,7 @@ defmodule AgeraOneWeb.TransactionView do
       value: transaction.value,
       blockNumber: transaction.block_number |> int_to_hex(),
       gasUsed: transaction.gas_used,
-      timestamp: transaction.block.header.timestamp |> DateTime.to_unix(:millisecond)
+      timestamp: transaction.block.timestamp |> DateTime.to_unix(:millisecond)
     }
   end
 

@@ -56,7 +56,7 @@ defmodule AgeraOneWeb.RpcController do
 
   @doc false
   def index(conn, %{"method" => "cita_blockNumber"}) do
-    number = Chain.get_latest_block_header() |> Map.get(:number)
+    {:ok, number} = Chain.get_latest_block_number()
 
     conn
     |> render(BlockView, "block_number.json", number: number)
@@ -125,7 +125,7 @@ defmodule AgeraOneWeb.RpcController do
   def get_block_by(params) do
     case Chain.get_block(params) do
       {:ok, %Block{} = block} ->
-        {:ok, block |> Repo.preload([:transactions, :header])}
+        {:ok, block |> Repo.preload([:transactions])}
 
       error ->
         error

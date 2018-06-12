@@ -3,8 +3,13 @@ defmodule AgeraOneWeb.BlockView do
   alias AgeraOneWeb.{BlockView, HeaderView, TransactionView}
   # alias AgeraOne.Chain.Block
 
-  def render("index.json", %{blocks: blocks}) do
-    %{result: render_many(blocks, BlockView, "block.json")}
+  def render("index.json", %{blocks: blocks, count: count}) do
+    %{
+      result: %{
+        blocks: render_many(blocks, BlockView, "block.json"),
+        count: count
+      }
+    }
   end
 
   def render("show.json", %{block: block}) do
@@ -20,7 +25,7 @@ defmodule AgeraOneWeb.BlockView do
       version: block.version,
       hash: block.hash,
       transactionsCount: block.transactions_count,
-      header: HeaderView.render("header.json", %{header: block.header})
+      header: block |> render_header
     }
   end
 
@@ -30,7 +35,7 @@ defmodule AgeraOneWeb.BlockView do
         version: block.version,
         hash: block.hash,
         transactionsCount: block.transactions_count,
-        header: HeaderView.render("header.json", %{header: block.header}),
+        header: block |> render_header,
         body: %{
           transactions: render_many(block.transactions, TransactionView, "transaction-hash.json")
         }
@@ -44,10 +49,27 @@ defmodule AgeraOneWeb.BlockView do
         version: block.version,
         hash: block.hash,
         transactionsCount: block.transactions_count,
-        header: HeaderView.render("header.json", %{header: block.header}),
+        header: block |> render_header,
         body: %{
           transactions:
             render_many(block.transactions, TransactionView, "transaction-hash-content.json")
+        }
+      }
+    }
+  end
+
+  defp render_header(block) do
+    %{
+      timestamp: block.timestamp |> DateTime.to_unix(:millisecond),
+      prevHash: block.prev_hash,
+      number: block.number |> int_to_hex(),
+      stateRoot: block.state_root,
+      transactionsRoot: block.transactions_root,
+      receiptsRoot: block.receipts_root,
+      gasUsed: block.gas_used,
+      proof: %{
+        Tendermint: %{
+          proposal: block.proposer
         }
       }
     }
