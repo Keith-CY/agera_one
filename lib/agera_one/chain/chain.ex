@@ -165,7 +165,7 @@ defmodule AgeraOne.Chain do
 
     offset = offset || 0
     limit = limit || 10
-    limited_query = query |> offset(^offset) |> limit(^limit)
+    limited_query = query |> order_by(desc: :number) |> offset(^offset) |> limit(^limit)
     count_query = query |> select([t], count(t.id))
 
     case limited_query |> Repo.all() do
@@ -424,7 +424,10 @@ defmodule AgeraOne.Chain do
 
     offset = offset || 0
     limit = limit || 10
-    limited_query = query |> offset(^offset) |> limit(^limit)
+
+    limited_query =
+      query |> order_by(desc: :block_number, asc: :index) |> offset(^offset) |> limit(^limit)
+
     count_query = query |> select([t], count(t.id))
 
     case limited_query |> Repo.all() do
