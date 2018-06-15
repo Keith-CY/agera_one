@@ -48,6 +48,8 @@
                         'Elixir.AgeraOneWeb.Router.Helpers',
                         'Elixir.AgeraOneWeb.RpcController',
                         'Elixir.AgeraOneWeb.RpcView',
+                        'Elixir.AgeraOneWeb.StatisticsController',
+                        'Elixir.AgeraOneWeb.StatisticsView',
                         'Elixir.AgeraOneWeb.TransactionController',
                         'Elixir.AgeraOneWeb.TransactionView',
                         'Elixir.AgeraOneWeb.UserSocket',

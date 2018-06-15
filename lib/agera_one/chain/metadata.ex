@@ -61,7 +61,7 @@ defmodule AgeraOne.Chain.Metadata do
       operator: operator,
       website: website,
       number: number |> Chain.hex_to_int(),
-      validators: validators |> Enum.join(),
+      validators: validators |> Enum.join(","),
       peer_count: peer_count
     }
   end

@@ -67,7 +67,7 @@ defmodule AgeraOneWeb.RpcController do
     case Chain.get_transaction(%{hash: hash}) do
       {:ok, %Transaction{} = transaction} ->
         conn
-        |> render(TransactionView, "transaction.json", transaction: transaction)
+        |> render(TransactionView, "transaction-rpc.json", transaction: transaction)
 
       {:error, reason} ->
         {:error, reason}

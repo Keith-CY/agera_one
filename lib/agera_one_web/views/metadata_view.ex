@@ -13,7 +13,7 @@ defmodule AgeraOneWeb.MetadataView do
         chainId: metadata.chain_id,
         chainName: metadata.chain_name,
         operator: metadata.operator,
-        validators: metadata.validators |> String.split(),
+        validators: metadata.validators |> String.split(","),
         website: metadata.website,
         genesisTimestamp: metadata.genesis_timestamp,
         number: metadata.number |> int_to_hex()

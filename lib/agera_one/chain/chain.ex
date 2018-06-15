@@ -8,7 +8,7 @@ defmodule AgeraOne.Chain do
 
   alias AgeraOne.Chain.{Block, Transaction, Message, Metadata, ABI, Balance}
 
-  @chain_url "http://47.75.129.215:1337/"
+  @chain_url "http://47.94.105.230:1337"
 
   @doc false
   def sync_10() do
@@ -124,82 +124,77 @@ defmodule AgeraOne.Chain do
     |> Repo.insert()
   end
 
+  def get_proposal_count() do
+    case get_metadata() do
+      {:ok, %{validators: validators}} ->
+        validatorList = validators |> String.split(",")
+
+        {:ok,
+         validatorList
+         |> Enum.map(fn v ->
+           %{
+             validator: v,
+             count:
+               Block |> where([b], b.proposer == ^v) |> select([b], count(b.id)) |> Repo.one()
+           }
+         end)}
+
+      {:error, reason} ->
+        {:error, reason}
+
+      error ->
+        {:error, error}
+    end
+  end
+
   @doc false
   def list_blocks do
     Repo.all(Block) |> Repo.preload([:transactions])
   end
 
-  def get_blocks(%{
-        number_from: number_from,
-        number_to: number_to,
-        transaction_from: transaction_from,
-        transaction_to: transaction_to,
-        offset: offset,
-        limit: limit
-      }) do
+  def get_blocks(params) do
     query = Block
 
     query =
-      case number_from do
-        nil -> query
-        number_from -> query |> where([b], b.number >= ^number_from)
+      case params |> Map.get(:number_from) do
+        nil ->
+          query
+
+        number_from ->
+          number_from = params.number_from |> hex_to_int
+          query |> where([b], b.number >= ^number_from)
       end
 
     query =
-      case number_to do
-        nil -> query
-        number_to -> query |> where([b], b.number <= ^number_to)
+      case params |> Map.get(:number_to) do
+        nil ->
+          query
+
+        number_to ->
+          number_to = params.number_to |> hex_to_int
+          query |> where([b], b.number <= ^number_to)
       end
 
     query =
-      case transaction_from do
+      case params |> Map.get(:transaction_from) do
         nil -> query
         transaction_from -> query |> where([b], b.transactions_count >= ^transaction_from)
       end
 
     query =
-      case transaction_to do
+      case params |> Map.get(:transaction_to) do
         nil -> query
         transaction_to -> query |> where([b], b.transactions_count <= ^transaction_to)
       end
 
-    offset = offset || 0
-    limit = limit || 10
+    offset = params |> Map.get(:offset) || 0
+    limit = params |> Map.get(:limit) || 10
     limited_query = query |> order_by(desc: :number) |> offset(^offset) |> limit(^limit)
     count_query = query |> select([t], count(t.id))
 
     case limited_query |> Repo.all() do
       nil -> {:error, :not_found}
       blocks -> {:ok, blocks, count_query |> Repo.one()}
-    end
-  end
-
-  def get_blocks(%{
-        numberFrom: numberFrom,
-        numberTo: numberTo,
-        transactionFrom: transactionFrom,
-        transactionTo: transactionTo
-      }) do
-    case Repo.all(
-           from(
-             b in Block,
-             where:
-               b.number >= ^numberFrom and b.number <= ^numberTo and
-                 b.transactions_count >= ^transactionFrom and
-                 b.transactions_count <= ^transactionTo,
-             order_by: [desc: :number]
-           )
-         ) do
-      nil -> {:error, :not_found}
-      blocks -> {:ok, blocks, blocks |> Kernal.length()}
-    end
-  end
-
-  @doc false
-  def get_blocks(offset \\ 0, limit \\ 10) do
-    case Repo.all(from(b in Block, offset: ^offset, limit: ^limit, order_by: [desc: :number])) do
-      nil -> {:error, :not_found}
-      blocks -> {:ok, blocks, Block |> Repo.aggregate(:count, :hash)}
     end
   end
 
@@ -246,7 +241,7 @@ defmodule AgeraOne.Chain do
 
   def get_latest_block_number() do
     case Repo.one(from(b in Block, order_by: [desc: b.number], limit: 1, select: b.number)) do
-      nil -> {:ok, -1}
+      nil -> {:error, :no_blocks}
       number -> {:ok, number}
     end
   end
@@ -321,9 +316,12 @@ defmodule AgeraOne.Chain do
   end
 
   def sync_block() do
-    {:ok, current} = get_latest_block_number()
-    IO.puts(current)
-    number = current + 1
+    number =
+      case get_latest_block_number() do
+        {:ok, current} -> current + 1
+        {:error, :no_blocks} -> 0
+      end
+
     sync_metadata(number)
     get_block(%{number: number})
   end
@@ -381,49 +379,49 @@ defmodule AgeraOne.Chain do
 
   alias AgeraOne.Chain.Transaction
 
-  def get_transactions(%{
-        account: account,
-        from: from,
-        to: to,
-        value_from: value_from,
-        value_to: value_to,
-        offset: offset,
-        limit: limit
-      }) do
+  def get_transactions(params) do
     query = Transaction
 
     query =
-      case from do
+      case params |> Map.get(:from) do
         nil -> query
         from -> query |> where([t], t.from == ^from)
       end
 
     query =
-      case to do
+      case params |> Map.get(:to) do
         nil -> query
         to -> query |> where([t], t.to == ^to)
       end
 
     query =
-      case account do
+      case params |> Map.get(:account) do
         nil -> query
         account -> query |> where([t], t.from == ^account or t.to == ^account)
       end
 
     query =
-      case value_from do
-        nil -> query
-        value_from -> query |> where([t], t.value >= ^value_from)
+      case params |> Map.get(:value_from) do
+        nil ->
+          query
+
+        value_from ->
+          value_from = value_from |> hex_to_int
+          query |> where([t], t.value >= ^value_from)
       end
 
     query =
-      case value_to do
-        nil -> query
-        value_from -> query |> where([t], t.value <= ^value_to)
+      case params |> Map.get(:value_to) do
+        nil ->
+          query
+
+        value_to ->
+          value_to = value_to |> hex_to_int
+          query |> where([t], t.value <= ^value_to)
       end
 
-    offset = offset || 0
-    limit = limit || 10
+    offset = params |> Map.get(:offset) || 0
+    limit = params |> Map.get(:limit) || 10
 
     limited_query =
       query |> order_by(desc: :block_number, asc: :index) |> offset(^offset) |> limit(^limit)

@@ -8,12 +8,23 @@ defmodule AgeraOneWeb.TransactionView do
     }
   end
 
-  def render("index.json", %{transactions: transactions}) do
-    %{result: render_many(transactions, TransactionView, "transaction.json")}
+  def render("index.json", %{transactions: transactions, count: count}) do
+    %{
+      result: %{
+        transactions: render_many(transactions, TransactionView, "transaction.json"),
+        count: count
+      }
+    }
   end
 
   def render("show.json", %{transaction: transaction}) do
     %{result: render_one(transaction, TransactionView, "transaction.json")}
+  end
+
+  def render("transaction-rpc.json", %{transaction: transaction}) do
+    %{
+      result: render_one(transaction, TransactionView, "transaction.json")
+    }
   end
 
   def render("transaction.json", %{transaction: transaction}) do
@@ -46,12 +57,16 @@ defmodule AgeraOneWeb.TransactionView do
     transaction.hash
   end
 
+  def render("transaction-hash-content-rpc.json", %{transaction: transaction}) do
+    %{
+      result: render_one(transaction, TransactionView, "transaction-hash-content")
+    }
+  end
+
   def render("transaction-hash-content.json", %{transaction: transaction}) do
     %{
-      result: %{
-        hash: transaction.hash,
-        content: transaction.content
-      }
+      hash: transaction.hash,
+      content: transaction.content
     }
   end
 end

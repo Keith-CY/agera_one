@@ -11,6 +11,7 @@ defmodule AgeraOneWeb.Router do
     resources("/transactions", TransactionController, except: [:new, :edit])
     resources("/abis", ABIController, except: [:new, :edit])
     resources("/balances", BalanceController, except: [:new, :edit])
+    get("/statistics", StatisticsController, :index)
   end
 
   scope "/", AgeraOneWeb do

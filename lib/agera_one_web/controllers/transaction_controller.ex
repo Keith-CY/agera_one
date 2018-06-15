@@ -11,8 +11,8 @@ defmodule AgeraOneWeb.TransactionController do
            account: params["account"],
            from: params["from"],
            to: params["to"],
-           value_from: params["value_from"],
-           value_to: params["value_to"],
+           value_from: params["valueFrom"],
+           value_to: params["valueTo"],
            offset: params["offset"] || 0,
            limit: params["limit"] || 10
          }) do
