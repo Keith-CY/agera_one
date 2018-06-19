@@ -42,7 +42,7 @@ defmodule AgeraOne.Chain do
   @doc false
 
   def sync_metadata(number \\ "latest") do
-    number = number |> number_formatter()
+    # number = number |> number_formatter()
 
     case get_metadata(number) do
       {:ok, metadata} ->
@@ -161,7 +161,7 @@ defmodule AgeraOne.Chain do
           query
 
         number_from ->
-          number_from = params.number_from |> hex_to_int
+          number_from = params.number_from |> number_formatter |> hex_to_int
           query |> where([b], b.number >= ^number_from)
       end
 
@@ -171,7 +171,7 @@ defmodule AgeraOne.Chain do
           query
 
         number_to ->
-          number_to = params.number_to |> hex_to_int
+          number_to = params.number_to |> number_formatter |> hex_to_int
           query |> where([b], b.number <= ^number_to)
       end
 
@@ -200,7 +200,7 @@ defmodule AgeraOne.Chain do
 
   @doc false
   def get_block(%{number: number}) do
-    number = number |> hex_to_int()
+    number = number |> number_formatter() |> hex_to_int()
 
     case Repo.get_by(Block, number: number) do
       nil ->
@@ -361,6 +361,15 @@ defmodule AgeraOne.Chain do
     })
   end
 
+  @doc """
+    Formatter number to hex, accept params like "latest", "earlist"
+
+  ## Examples
+
+
+
+  """
+
   def number_formatter(number) do
     cond do
       number == "latest" ->
@@ -372,7 +381,7 @@ defmodule AgeraOne.Chain do
       number == "earliest" ->
         "0x0"
 
-      true ->
+      number ->
         number |> int_to_hex()
     end
   end
@@ -406,7 +415,7 @@ defmodule AgeraOne.Chain do
           query
 
         value_from ->
-          value_from = value_from |> hex_to_int
+          value_from = value_from |> number_formatter |> hex_to_int
           query |> where([t], t.value >= ^value_from)
       end
 
@@ -416,7 +425,7 @@ defmodule AgeraOne.Chain do
           query
 
         value_to ->
-          value_to = value_to |> hex_to_int
+          value_to = value_to |> number_formatter |> hex_to_int
           query |> where([t], t.value <= ^value_to)
       end
 

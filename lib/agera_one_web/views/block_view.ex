@@ -17,7 +17,7 @@ defmodule AgeraOneWeb.BlockView do
   end
 
   def render("block_number.json", %{number: number}) do
-    %{result: number}
+    %{result: number |> hex_to_int()}
   end
 
   def render("block.json", %{block: block}) do

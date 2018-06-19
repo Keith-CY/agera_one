@@ -1,0 +1,204 @@
+    <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.18.3">
+    <title>AgeraOneWeb.TransactionController – agera_one v0.0.1</title>
+    <link rel="stylesheet" href="dist/app-480ffdc169.css" />
+    
+    <script src="dist/sidebar_items-f924776e2b.js"></script>
+    
+    
+    
+    
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+
+    <div class="main">
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Sidebar</span>
+</button>
+<button class="sidebar-button night-mode-toggle">
+  <span class="icon-theme" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Theme</span>
+</button>
+<section class="sidebar">
+
+  
+  <a href="api-reference.html" class="sidebar-projectLink">
+    <div class="sidebar-projectDetails">
+      <h1 class="sidebar-projectName">
+        agera_one
+      </h1>
+      <h2 class="sidebar-projectVersion">
+        v0.0.1
+      </h2>
+    </div>
+    
+  </a>
+
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <input name="q" type="text" id="search-list" class="search-input" placeholder="Search" aria-label="Search" autocomplete="off" />
+  </form>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+    
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+    
+
+    
+
+    
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="visible-xs">agera_one v0.0.1</small>
+        AgeraOneWeb.TransactionController
+        
+      </h1>
+
+      
+
+      
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+          
+
+          
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#index/2">index(conn, params)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Get transactions</p>
+</div>
+  
+</div>
+
+  </div>
+
+
+          
+
+        </section>
+      
+
+      
+
+      
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Functions
+          </h1>
+          <div class="detail" id="index/2">
+  
+  
+  <div class="detail-header">
+    <a href="#index/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">index(conn, params)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    <p>  Get transactions</p>
+<h2 id="index/2-params" class="section-heading">
+  <a href="#index/2-params" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Params
+</h2>
+
+<pre><code class="elixir">{
+  &quot;account&quot;:  &quot;the addr transactions related to&quot;, // hash
+  &quot;from&quot;:  &quot;the addr transactions from&quot;, // hash
+  &quot;to&quot;:  &quot;the addr transactions to&quot;, // hash
+  &quot;valueFrom&quot;:  &quot;min value&quot;, // integer
+  &quot;valueTo&quot;:  &quot;max value&quot;, // integer
+  &quot;offset&quot;:  &quot;offset&quot;, // default to 0
+  &quot;limit&quot;:  &quot;limit&quot;, // default to 10
+}</code></pre>
+<h2 id="index/2-return" class="section-heading">
+  <a href="#index/2-return" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Return
+</h2>
+
+<pre><code class="elixir">{
+  &quot;result&quot;: {
+    &quot;count&quot;: count,
+    &quot;transactions&quot;: [
+      &quot;value&quot;: null,
+      &quot;to&quot;: null,
+      &quot;timestamp&quot;: 1529379404666,
+      &quot;hash&quot;: &quot;0x760f07bc5482f3a084f5031da0d2794ddd0c4913dc9617005966ff9ed3425f10&quot;,
+      &quot;gasUsed&quot;: &quot;0x0&quot;,
+      &quot;from&quot;: &quot;0xd5ec01b4f7d8206bf01002d820ff54a0b8d9399d&quot;,
+      &quot;content&quot;: &quot;0x0a1e186420bec3082a14627306090abab3a6e1400e9345bc60c78a8bef57380112410c68ec726f98a65ea766ad0700da48a596031ed52c286e0b8b7ca662308b61cb1ff9443dc9152e0071e24970fff7dec20431fa0a6663f43bdbf519f0ee4ae82501&quot;,
+      &quot;blockNumber&quot;: &quot;0x22169&quot;
+    ]
+  }
+}</code></pre>
+
+  </section>
+</div>
+
+        </section>
+      
+
+      
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.18.3),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+            </span>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  <script src="dist/app-9bd040e5e5.js"></script>
+  
+  
+  
+  
+  </body>
+</html>
+

@@ -1,0 +1,214 @@
+    <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.18.3">
+    <title>AgeraOneWeb.BlockController – agera_one v0.0.1</title>
+    <link rel="stylesheet" href="dist/app-480ffdc169.css" />
+    
+    <script src="dist/sidebar_items-f924776e2b.js"></script>
+    
+    
+    
+    
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+
+    <div class="main">
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Sidebar</span>
+</button>
+<button class="sidebar-button night-mode-toggle">
+  <span class="icon-theme" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Theme</span>
+</button>
+<section class="sidebar">
+
+  
+  <a href="api-reference.html" class="sidebar-projectLink">
+    <div class="sidebar-projectDetails">
+      <h1 class="sidebar-projectName">
+        agera_one
+      </h1>
+      <h2 class="sidebar-projectVersion">
+        v0.0.1
+      </h2>
+    </div>
+    
+  </a>
+
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <input name="q" type="text" id="search-list" class="search-input" placeholder="Search" aria-label="Search" autocomplete="off" />
+  </form>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+    
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+    
+
+    
+
+    
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="visible-xs">agera_one v0.0.1</small>
+        AgeraOneWeb.BlockController
+        
+      </h1>
+
+      
+
+      
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+          
+
+          
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#index/2">index(conn, params)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Get Blocks</p>
+</div>
+  
+</div>
+
+  </div>
+
+
+          
+
+        </section>
+      
+
+      
+
+      
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Functions
+          </h1>
+          <div class="detail" id="index/2">
+  
+  
+  <div class="detail-header">
+    <a href="#index/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">index(conn, params)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    <p>  Get Blocks</p>
+<h2 id="index/2-params" class="section-heading">
+  <a href="#index/2-params" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Params
+</h2>
+
+<pre><code class="elixir">{
+  &quot;numberFrom&quot;: &quot;min block number&quot;, //  number or integer
+  &quot;numberTo&quot;: &quot;max block number&quot;, // number or integer
+  &quot;transactionFrom&quot;: &quot;min transaction count&quot;, // integer
+  &quot;transactionTo&quot;: &quot;max transaction count&quot;, // integer
+  &quot;offset&quot;: &quot;offset&quot;, // default to 0
+  &quot;limit&quot;: &quot;limit&quot;, // default to 10
+}</code></pre>
+<h2 id="index/2-return" class="section-heading">
+  <a href="#index/2-return" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Return
+</h2>
+
+<pre><code class="elixir">{
+  &quot;result&quot;: {
+    &quot;count&quot;: &quot;count&quot;,
+    &quot;blocks&quot;: [
+      {
+        &quot;version&quot;: 0,
+        &quot;transactionsCount&quot;: 0,
+        &quot;header&quot;: {
+          &quot;transactionsRoot&quot;: &quot;0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421&quot;,
+          &quot;timestamp&quot;: 1529384777622,
+          &quot;stateRoot&quot;: &quot;0x87880193218a785156835fb80e807e5d7845c15d1021dfd28153b96097ff5130&quot;,
+          &quot;receiptsRoot&quot;: &quot;0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421&quot;,
+          &quot;proof&quot;: {
+            &quot;Tendermint&quot;: {
+              &quot;proposal&quot;: &quot;0x978db6aa83074448990c97a287d8092f8c724f2f&quot;
+            }
+          },
+          &quot;prevHash&quot;: &quot;0x784a5c68dd712c6b968b937db3b68e7726c7a42007b82ff7d8cd7a02e41a7587&quot;,
+          &quot;number&quot;: &quot;0x31&quot;,
+          &quot;gasUsed&quot;: &quot;0x0&quot;
+        },
+        &quot;hash&quot;: &quot;0x87d6710d3e146f522891ec1e1731df764ddca1e407045768870bbadb54ea34ca&quot;
+      },
+    ]
+  }
+}</code></pre>
+
+  </section>
+</div>
+
+        </section>
+      
+
+      
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.18.3),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+            </span>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  <script src="dist/app-9bd040e5e5.js"></script>
+  
+  
+  
+  
+  </body>
+</html>
+

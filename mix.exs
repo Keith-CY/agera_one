@@ -46,7 +46,7 @@ defmodule AgeraOne.Mixfile do
       {:sha3, "~> 2.0"},
       {:exth_crypto, "~> 0.1.3"},
       {:cors_plug, "~> 1.5"},
-
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
 
       # {:google_protos, "~> 0.1"}
     ]
