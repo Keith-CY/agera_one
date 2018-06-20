@@ -59,7 +59,7 @@ defmodule AgeraOne.Chain.Transaction do
             data: data,
             valid_until_block: valid_until_block,
             from: from,
-            value: value
+            value: 0
           }
 
         tx ->
