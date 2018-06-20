@@ -565,13 +565,37 @@ defmodule AgeraOne.Chain do
     end
   end
 
-  def int_to_hex(int) when is_integer(int) do
-    "0x" <> Integer.to_string(int, 16)
+  def int_to_hex(number) when is_integer(number) do
+    "0x" <> (number |> Integer.to_string(16))
   end
 
-  def int_to_hex(int) do
-    int
+  def int_to_hex(number) when is_binary(number) do
+    case number |> String.slice(0..1) do
+      "0x" ->
+        number
+
+      _ ->
+        case number |> Integer.parse() do
+          {int, ""} -> int |> int_to_hex()
+          error -> {:error, error}
+        end
+    end
   end
+
+  def int_to_hex(number) do
+    number
+  end
+
+  # def int_to_hex(int) when is_integer(int) do
+  #   {0, hex} = Integer.parse(int, 16)
+  #   "0" <> hex
+  # end
+
+  # def int_to_hex(int) do
+
+  #   {int, ""} = Integer.parse(int, 16)
+  #   int |> int_to_hex()
+  # end
 
   def hex_to_int(hex) when is_binary(hex) do
     {int, ""} =

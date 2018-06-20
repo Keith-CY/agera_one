@@ -15,7 +15,7 @@ defmodule AgeraOneWeb.MetadataView do
         operator: metadata.operator,
         validators: metadata.validators |> String.split(","),
         website: metadata.website,
-        genesisTimestamp: metadata.genesis_timestamp,
+        genesisTimestamp: metadata.genesis_timestamp |> DateTime.to_unix(:millisecond),
         number: metadata.number |> int_to_hex()
       }
     }

@@ -23,6 +23,6 @@ defmodule AgeraOne.Chain.Periodically do
   end
 
   defp schedule_work() do
-    Process.send_after(self(), :work, 300000)
+    Process.send_after(self(), :work, 1000)
   end
 end
