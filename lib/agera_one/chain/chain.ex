@@ -19,7 +19,7 @@ defmodule AgeraOne.Chain do
 
   @doc false
   def sync_peer_count() do
-    request_chain("net_peerCount")
+    request_chain("peerCount")
   end
 
   def get_peer_count() do
@@ -49,7 +49,7 @@ defmodule AgeraOne.Chain do
         {:ok, metadata}
 
       _ ->
-        with {:ok, metadata} <- request_chain("cita_getMetaData", [number |> int_to_hex()]),
+        with {:ok, metadata} <- request_chain("getMetaData", [number |> int_to_hex()]),
              {:ok, peer_count} <- sync_peer_count() do
           metadata
           |> Map.put("number", number)
@@ -72,7 +72,7 @@ defmodule AgeraOne.Chain do
     else
       IO.puts("Requesting ABI at addr: #{addr}, number: #{spec_number}")
 
-      case request_chain("eth_getAbi", [addr, spec_number]) do
+      case request_chain("getAbi", [addr, spec_number]) do
         {:ok, "0x"} ->
           {:ok, %{content: "0x", addr: addr, number: spec_number |> int_to_hex()}}
 
@@ -101,7 +101,7 @@ defmodule AgeraOne.Chain do
     else
       IO.puts("Requesting Balance at addr: #{addr}, number: #{spec_number}")
 
-      case request_chain("eth_getBalance", [addr, spec_number]) do
+      case request_chain("getBalance", [addr, spec_number]) do
         {:ok, "0x"} ->
           {:ok, %{value: "0x0", addr: addr, spec_number: spec_number |> int_to_hex()}}
 
@@ -206,7 +206,7 @@ defmodule AgeraOne.Chain do
 
     case Repo.get_by(Block, number: number) do
       nil ->
-        case request_chain("cita_getBlockByNumber", [number |> int_to_hex(), false]) do
+        case request_chain("getBlockByNumber", [number |> int_to_hex(), false]) do
           {:ok, data} ->
             cache_block(data)
 
@@ -226,7 +226,7 @@ defmodule AgeraOne.Chain do
         {:ok, block}
 
       _ ->
-        case request_chain("cita_getBlockByHash", [hash, false]) do
+        case request_chain("getBlockByHash", [hash, false]) do
           {:ok, data} ->
             cache_block(data)
 
@@ -350,7 +350,7 @@ defmodule AgeraOne.Chain do
 
   def get_transaction_count(addr, number \\ "latest") do
     number = number |> number_formatter()
-    request_chain("eth_getTransactionCount", [addr, number])
+    request_chain("getTransactionCount", [addr, number])
   end
 
   @doc false
@@ -466,7 +466,7 @@ defmodule AgeraOne.Chain do
   def request_transaction(hash) do
     with(
       {:ok, %{"content" => content, "hash" => hash}} <-
-        request_chain("cita_getTransaction", [hash]),
+        request_chain("getTransaction", [hash]),
       {:ok,
        %{
          "blockHash" => block_hash,
@@ -474,7 +474,7 @@ defmodule AgeraOne.Chain do
          "contractAddress" => contract_address,
          "gasUsed" => gas_used,
          "transactionIndex" => index
-       }} <- request_chain("eth_getTransactionReceipt", [hash])
+       }} <- request_chain("getTransactionReceipt", [hash])
     ) do
       {:ok,
        %Transaction{

@@ -12,14 +12,14 @@ defmodule AgeraOneWeb.RpcController do
 
     ### Params
 
-    - {"method" => "net_peerCount"}
+    - {"method" => "peerCount"}
 
     ### Return
 
     - { "result": "0x3" }
 
   """
-  def index(conn, %{"method" => "net_peerCount"}) do
+  def index(conn, %{"method" => "peerCount"}) do
     case Chain.get_peer_count() do
       {:ok, peer_count} ->
         conn
@@ -35,7 +35,7 @@ defmodule AgeraOneWeb.RpcController do
 
     ### Params
 
-    - {"method" => "cita_getMetaData", "params" => [height]}
+    - {"method" => "getMetaData", "params" => [height]}
 
     ### Return
 
@@ -56,7 +56,7 @@ defmodule AgeraOneWeb.RpcController do
         }
       }
   """
-  def index(conn, %{"method" => "cita_getMetaData", "params" => [number]}) do
+  def index(conn, %{"method" => "getMetaData", "params" => [number]}) do
     case Chain.get_metadata(number) do
       {:ok, %Metadata{} = metadata} ->
         conn |> render(MetadataView, "metadata.json", metadata: metadata)
@@ -69,7 +69,7 @@ defmodule AgeraOneWeb.RpcController do
   @doc """
     Get ABI
   """
-  def index(conn, %{"method" => "eth_getAbi", "params" => [address, number]}) do
+  def index(conn, %{"method" => "getAbi", "params" => [address, number]}) do
     case Chain.get_abi(address, number) do
       {:ok, abi} -> conn |> render(ABIView, "abi.json", abi: abi)
       {:error, reason} -> {:error, reason}
@@ -81,13 +81,13 @@ defmodule AgeraOneWeb.RpcController do
 
     ### Params
 
-    - { "method" => "eth_getBalance", "params" => [addr, height] }
+    - { "method" => "getBalance", "params" => [addr, height] }
 
     ### Return
 
     - { "result": balance }
   """
-  def index(conn, %{"method" => "eth_getBalance", "params" => [address, number]}) do
+  def index(conn, %{"method" => "getBalance", "params" => [address, number]}) do
     case Chain.get_balance(address, number) do
       {:ok, balance} -> conn |> render(BalanceView, "balance.json", balance: balance)
       {:error, reason} -> {:error, reason}
@@ -99,13 +99,13 @@ defmodule AgeraOneWeb.RpcController do
 
     ### Params
 
-    - { "method": "eth_getTransactionCount", "params":["0x627306090abaB3A6e1400e9345bC60c78a8BEf57", "latest"] }
+    - { "method": "getTransactionCount", "params":["0x627306090abaB3A6e1400e9345bC60c78a8BEf57", "latest"] }
 
     ### Return
 
     - { "result": count }
   """
-  def index(conn, %{"method" => "eth_getTransactionCount", "params" => [addr, number]}) do
+  def index(conn, %{"method" => "getTransactionCount", "params" => [addr, number]}) do
     case Chain.get_transaction_count(addr, number) do
       {:ok, count} -> conn |> render(TransactionView, "count.json", count: count)
       {:error, reason} -> {:error, reason}
@@ -117,13 +117,13 @@ defmodule AgeraOneWeb.RpcController do
 
     ### Params
 
-    - { "method" => "cita_blockNumber" }
+    - { "method" => "blockNumber" }
 
     ### Return
 
     - { "result": number }
   """
-  def index(conn, %{"method" => "cita_blockNumber"}) do
+  def index(conn, %{"method" => "blockNumber"}) do
     {:ok, number} = Chain.get_latest_block_number()
 
     conn
@@ -135,7 +135,7 @@ defmodule AgeraOneWeb.RpcController do
 
     ### Params
 
-    - { "method" => "cita_getTransaction", "params" => [hash]}
+    - { "method" => "getTransaction", "params" => [hash]}
 
     ### Return
 
@@ -152,7 +152,7 @@ defmodule AgeraOneWeb.RpcController do
         }
       }
   """
-  def index(conn, %{"method" => "cita_getTransaction", "params" => [hash]}) do
+  def index(conn, %{"method" => "getTransaction", "params" => [hash]}) do
     case Chain.get_transaction(%{hash: hash}) do
       {:ok, %Transaction{} = transaction} ->
         conn
@@ -165,7 +165,7 @@ defmodule AgeraOneWeb.RpcController do
 
   @doc false
 
-  def index(conn, %{"method" => "cita_getTransactionReceipt", "params" => [hash]}) do
+  def index(conn, %{"method" => "getTransactionReceipt", "params" => [hash]}) do
     case Chain.get_transaction(%{hash: hash}) do
       {:ok, %Transaction{} = transaction} ->
         conn
@@ -177,7 +177,7 @@ defmodule AgeraOneWeb.RpcController do
   end
 
   # @doc false
-  # def index(conn, %{"method" => "cita_getTransactionReceipt", "params" => [hash]}) do
+  # def index(conn, %{"method" => "getTransactionReceipt", "params" => [hash]}) do
   #   case Chain.get_transaction(%{hash: hash}) do
   #     {:ok, %Transaction{} = transaction} ->
   #       conn
@@ -193,7 +193,7 @@ defmodule AgeraOneWeb.RpcController do
 
     ### Params
 
-    - { "method": "cita_getBlockByNumber",
+    - { "method": "getBlockByNumber",
         "params": [
           number,
           false
@@ -227,7 +227,7 @@ defmodule AgeraOneWeb.RpcController do
         }
       }
   """
-  def index(conn, %{"method" => "cita_getBlockByNumber", "params" => [number, detailed]}) do
+  def index(conn, %{"method" => "getBlockByNumber", "params" => [number, detailed]}) do
     case get_block_by(%{number: number}) do
       {:ok, block} ->
         render_block(conn, block, detailed)
@@ -242,7 +242,7 @@ defmodule AgeraOneWeb.RpcController do
 
     ### Params
 
-    - { "method": "cita_getBlockByHash",
+    - { "method": "getBlockByHash",
         "params": [
           hash,
           false
@@ -276,7 +276,7 @@ defmodule AgeraOneWeb.RpcController do
         }
       }
   """
-  def index(conn, %{"method" => "cita_getBlockByHash", "params" => [hash, detailed]}) do
+  def index(conn, %{"method" => "getBlockByHash", "params" => [hash, detailed]}) do
     case get_block_by(%{hash: hash}) do
       {:ok, block} ->
         render_block(conn, block, detailed)
