@@ -8,7 +8,7 @@ defmodule AgeraOne.Chain do
 
   alias AgeraOne.Chain.{Block, Transaction, Message, Metadata, ABI, Balance}
 
-  @chain_url "http://47.94.105.230:1337"
+  @chain_url "121.196.200.225:1337"
 
   @doc false
   def sync_10() do
