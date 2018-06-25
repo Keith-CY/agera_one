@@ -54,12 +54,12 @@ defmodule AgeraOne.Chain.Transaction do
           value: value
         } ->
           %{
-            to: to,
+            to: "0x" <> to,
             nonce: nonce,
             data: data,
             valid_until_block: valid_until_block,
             from: from,
-            value: 0
+            value: value
           }
 
         tx ->

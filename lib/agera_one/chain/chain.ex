@@ -320,8 +320,11 @@ defmodule AgeraOne.Chain do
   def sync_block() do
     number =
       case get_latest_block_number() do
-        {:ok, current} -> current + 1
-        {:error, :no_blocks} -> 0
+        {:ok, current} ->
+          current + 1
+
+        {:error, :no_blocks} ->
+          0
       end
 
     sync_metadata(number)
@@ -395,14 +398,22 @@ defmodule AgeraOne.Chain do
 
     query =
       case params |> Map.get(:from) do
-        nil -> query
-        from -> query |> where([t], t.from == ^from)
+        nil ->
+          query
+
+        from ->
+          query |> where([t], t.from == ^from)
+          # from ->
+          #   query |> where([t], ilike(t.from, ^"%#{from}%"))
       end
 
     query =
       case params |> Map.get(:to) do
-        nil -> query
-        to -> query |> where([t], t.to == ^to)
+        nil ->
+          query
+
+        to ->
+          query |> where([t], t.to == ^to)
       end
 
     query =
@@ -465,8 +476,7 @@ defmodule AgeraOne.Chain do
   """
   def request_transaction(hash) do
     with(
-      {:ok, %{"content" => content, "hash" => hash}} <-
-        request_chain("getTransaction", [hash]),
+      {:ok, %{"content" => content, "hash" => hash}} <- request_chain("getTransaction", [hash]),
       {:ok,
        %{
          "blockHash" => block_hash,
