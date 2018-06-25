@@ -11,6 +11,9 @@ defmodule AgeraOne.Repo.Migrations.CreateChainMetadatas do
       add(:website, :string)
       add(:number, :integer)
       add(:peer_count, :string)
+      add(:token_name, :string)
+      add(:token_symbol, :string)
+      add(:token_avatar, :string)
 
       timestamps()
     end
