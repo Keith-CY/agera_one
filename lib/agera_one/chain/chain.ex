@@ -8,7 +8,7 @@ defmodule AgeraOne.Chain do
 
   alias AgeraOne.Chain.{Block, Transaction, Message, Metadata, ABI, Balance}
 
-  @chain_url "121.196.200.225:1337"
+  @chain_url Application.get_env(:agera_one, AgeraOne.Chain) |> List.first() |> elem(1)
 
   @doc false
   def sync_10() do
@@ -221,6 +221,8 @@ defmodule AgeraOne.Chain do
 
   @doc false
   def get_block(%{hash: hash}) do
+    hash = hash |> String.downcase()
+
     case Repo.get_by(Block, hash: hash) do
       %Block{} = block ->
         {:ok, block}
@@ -402,6 +404,7 @@ defmodule AgeraOne.Chain do
           query
 
         from ->
+          from = from |> String.downcase()
           query |> where([t], t.from == ^from)
           # from ->
           #   query |> where([t], ilike(t.from, ^"%#{from}%"))
@@ -413,13 +416,18 @@ defmodule AgeraOne.Chain do
           query
 
         to ->
+          to = to |> String.downcase()
           query |> where([t], t.to == ^to)
       end
 
     query =
       case params |> Map.get(:account) do
-        nil -> query
-        account -> query |> where([t], t.from == ^account or t.to == ^account)
+        nil ->
+          query
+
+        account ->
+          account = account |> String.downcase()
+          query |> where([t], t.from == ^account or t.to == ^account)
       end
 
     query =

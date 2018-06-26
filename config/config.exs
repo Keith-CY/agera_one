@@ -6,16 +6,14 @@
 use Mix.Config
 
 # General application configuration
-config :agera_one,
-  ecto_repos: [AgeraOne.Repo]
+config :agera_one, ecto_repos: [AgeraOne.Repo]
 
 # Configures the endpoint
 config :agera_one, AgeraOneWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "6Z/bLlNoPLs6Vwl9eP8a0zTFzFzBoqTL4NFO7MEl7SNIBAjZdesQbEaiXrveMjK5",
   render_errors: [view: AgeraOneWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: AgeraOne.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: AgeraOne.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -24,4 +22,4 @@ config :logger, :console,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

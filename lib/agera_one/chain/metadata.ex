@@ -11,6 +11,7 @@ defmodule AgeraOne.Chain.Metadata do
     field(:validators, :string)
     field(:website, :string)
     field(:number, :integer)
+    field(:block_interval, :integer)
     field(:peer_count, :string)
     field(:token_name, :string)
     field(:token_symbol, :string)
@@ -30,6 +31,7 @@ defmodule AgeraOne.Chain.Metadata do
       :website,
       :validators,
       :number,
+      :block_interval,
       :peer_count,
       :token_name,
       :token_symbol,
@@ -43,6 +45,7 @@ defmodule AgeraOne.Chain.Metadata do
       :website,
       :validators,
       :number,
+      :block_interval,
       :peer_count,
       :token_name,
       :token_symbol,
@@ -59,6 +62,7 @@ defmodule AgeraOne.Chain.Metadata do
            "validators" => validators,
            "website" => website,
            "number" => number,
+           "blockInterval" => block_interval,
            "peerCount" => peer_count,
            "tokenName" => token_name,
            "tokenSymbol" => token_symbol,
@@ -73,6 +77,7 @@ defmodule AgeraOne.Chain.Metadata do
       operator: operator,
       website: website,
       number: number |> Chain.hex_to_int(),
+      block_interval: block_interval,
       validators: validators |> Enum.join(","),
       peer_count: peer_count,
       token_name: token_name,

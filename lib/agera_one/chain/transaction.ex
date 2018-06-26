@@ -59,7 +59,7 @@ defmodule AgeraOne.Chain.Transaction do
             data: data,
             valid_until_block: valid_until_block,
             from: from,
-            value: value
+            value: value |> ExthCrypto.Math.bin_to_hex() |> Chain.hex_to_int()
           }
 
         tx ->
