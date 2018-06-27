@@ -16,7 +16,7 @@ defmodule AgeraOne.Chain.Transaction do
     field(:from, :string)
     field(:to, :string)
     field(:data, :binary)
-    field(:value, :integer)
+    field(:value, :binary)
     belongs_to(:block, Block)
 
     timestamps()
@@ -59,7 +59,7 @@ defmodule AgeraOne.Chain.Transaction do
             data: data,
             valid_until_block: valid_until_block,
             from: from,
-            value: value |> ExthCrypto.Math.bin_to_hex() |> Chain.hex_to_int()
+            value: value
           }
 
         tx ->

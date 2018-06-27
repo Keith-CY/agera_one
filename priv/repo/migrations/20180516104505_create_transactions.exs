@@ -13,7 +13,7 @@ defmodule AgeraOne.Repo.Migrations.CreateTransactions do
       add(:from, :string)
       add(:to, :string)
       add(:data, :binary)
-      add(:value, :bigint)
+      add(:value, :binary)
       add(:block_id, references(:blocks, on_delete: :delete_all))
 
       timestamps()
