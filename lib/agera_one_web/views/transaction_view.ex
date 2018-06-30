@@ -33,7 +33,7 @@ defmodule AgeraOneWeb.TransactionView do
       content: transaction.content,
       from: transaction.from,
       to: transaction.to,
-      value: transaction.value,
+      value: ("0x" <> transaction.value) |> ExthCrypto.Math.bin_to_hex(),
       blockNumber: transaction.block_number |> int_to_hex(),
       gasUsed: transaction.gas_used,
       timestamp: transaction.block.timestamp |> DateTime.to_unix(:millisecond)

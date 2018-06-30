@@ -53,8 +53,12 @@ defmodule AgeraOne.Chain.Transaction do
           to: to,
           value: value
         } ->
+          if is_nil(to) do
+            to = "0x" <> to
+          end
+
           %{
-            to: "0x" <> to,
+            to: to,
             nonce: nonce,
             data: data,
             valid_until_block: valid_until_block,
