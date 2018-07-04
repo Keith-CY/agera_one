@@ -1,4 +1,4 @@
 #!/bin/bash
 
-mix init
+MIX_ENV=prod mix init
 
