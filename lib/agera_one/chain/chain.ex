@@ -344,8 +344,12 @@ defmodule AgeraOne.Chain do
          {:ok, decoded} <- Poison.decode(body),
          %{"result" => result} <- decoded do
       cond do
-        is_nil(result) -> {:error, :not_found}
-        true -> {:ok, result}
+        is_nil(result) ->
+          # IO.inspect(decoded)
+          {:error, :not_found}
+
+        true ->
+          {:ok, result}
       end
     else
       {:error, reason} -> {:error, reason}

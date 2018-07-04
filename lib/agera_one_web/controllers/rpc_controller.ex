@@ -228,7 +228,7 @@ defmodule AgeraOneWeb.RpcController do
       }
   """
   def index(conn, %{"method" => "getBlockByNumber", "params" => [number, detailed]}) do
-    case get_block_by(%{number: number}) do
+    case get_block(%{number: number}) do
       {:ok, block} ->
         render_block(conn, block, detailed)
 
@@ -277,7 +277,7 @@ defmodule AgeraOneWeb.RpcController do
       }
   """
   def index(conn, %{"method" => "getBlockByHash", "params" => [hash, detailed]}) do
-    case get_block_by(%{hash: hash}) do
+    case get_block(%{hash: hash}) do
       {:ok, block} ->
         render_block(conn, block, detailed)
 
@@ -287,7 +287,7 @@ defmodule AgeraOneWeb.RpcController do
   end
 
   @doc false
-  def get_block_by(params) do
+  def get_block(params) do
     case Chain.get_block(params) do
       {:ok, %Block{} = block} ->
         {:ok, block |> Repo.preload([:transactions])}
