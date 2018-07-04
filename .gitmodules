@@ -1,0 +1,3 @@
+[submodule "lib/agera_one/message/cita-proto"]
+	path = lib/agera_one/message/cita-proto
+	url = https://github.com/cryptape/cita-proto
