@@ -65,7 +65,7 @@ defmodule AgeraOne.Mixfile do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"],
-      init: ["ecto.create", "ecto.migrate"]
+      init: ["deps.get", "ecto.create", "ecto.migrate"]
     ]
   end
 end
